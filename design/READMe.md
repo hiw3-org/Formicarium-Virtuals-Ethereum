@@ -1,0 +1,2 @@
+# Design
+This directory contains the design documents for the project. The design documents are intended to provide a high-level overview of the project and to provide a reference for the design decisions that were made during the development of the project.

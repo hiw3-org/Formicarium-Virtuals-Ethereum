@@ -1,0 +1,2 @@
+# Hardware
+This directory contains the code related to the 3D printer hardware. This includes the firmware that runs on the microcontroller, as well as any other code that interacts with the physical components of the printer.

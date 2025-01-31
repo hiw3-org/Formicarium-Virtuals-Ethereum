@@ -1,0 +1,2 @@
+# Idea
+This folder is dedicated to capturing and organizing ideas, brainstorming sessions, and other related files. It serves as a central repository for all conceptual work and creative thinking, ensuring that all innovative thoughts are documented and easily accessible for future reference.
