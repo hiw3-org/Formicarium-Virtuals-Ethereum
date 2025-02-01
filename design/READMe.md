@@ -4,7 +4,5 @@ This directory contains the design documents for the project. The design documen
 ## Formicarium logo
 From the name - Latin word formica, meaning ant, the logo is a cyber ant that represents both an AI agent and the meaning of an ant and ant colonies as natural self-organising systems.
 
-![formicarium logo](formicarium_logo.png =250x)
-
 ## Colors 
 We will use a warm color palette that represent the colors of ants, a cold, blue palette that represents robots and technology and an additional palette like a mix of colors.
