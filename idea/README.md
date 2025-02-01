@@ -7,3 +7,9 @@ Our project envisions a futuristic coworking factory scenario where multiple mac
 ## Project Name
 Keywords that we focused on: Agent, autonomy, robotics, AI, blockchain, self-organizing, natural organisations  
 The name we chose is **Formicarium**, which is the scientific term for an ant nest or ant farm. It comes from the Latin word formica, meaning ant. It represents self-organizing systems.
+
+## Concept of the process in our system
+Defined with the sequence diagram
+
+<img width="4849" alt="Sequence Diagram" src="https://github.com/user-attachments/assets/f3041b92-ea40-4a53-bb08-01ca19a7bc4d" />
+
