@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "chatbot-python"
+version = "0.0.1"
+description = "Agentic Ethereum Chatbot"
+authors = ["Formicarium"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+python-dotenv = "^1.0.1"
+cdp-langchain = "^0.0.13"
+fastapi = "^0.115.8"
+uvicorn = "^0.34.0"
+openai = "^1.61.0"
+requests = "^2.32.3"
+opencv-python = "^4.11.0.86"
+trimesh = "^4.6.1"
+pillow = "^11.1.0"
+manifold3d = "^3.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
