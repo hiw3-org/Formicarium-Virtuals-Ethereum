@@ -1,0 +1,5 @@
+.env
+node_modules
+.venv
+wallet_data.txt
+*.png
