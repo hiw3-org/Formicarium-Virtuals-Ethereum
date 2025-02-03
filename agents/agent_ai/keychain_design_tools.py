@@ -32,7 +32,7 @@ def shorten_filename(prompt: str) -> str:
 
 
 def image_to_stl(
-    input_image_path, output_stl_path, base_height=5, ant_height=10, z_scale=1, max_dimensions=(200, 200, 250)
+    input_image_path, output_stl_path, base_height=15, ant_height=30, z_scale=1, max_dimensions=(200, 200, 250)
 ):
     """
     Converts an input image into a 3D STL file with an extruded base and a keychain hole.
@@ -53,7 +53,7 @@ def image_to_stl(
     pixels = np.array(img)
 
     # Convert image to heightmap
-    height_map = np.where(pixels < threshold, ant_height, base_height).astype(np.float32)
+    height_map = np.where(pixels < threshold, ant_height, 0).astype(np.float32)
 
     def create_mesh_from_heightmap(heightmap):
         """Creates a 3D mesh from a heightmap and embeds it onto a circular base, adding a keychain hole."""
