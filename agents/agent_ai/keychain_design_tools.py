@@ -13,7 +13,7 @@ import subprocess
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-from agents.agent_ai.config import prusa_slicer_path, prusa_settings
+import agents.agent_ai.config as config
 
 output_folder = Path("agents/keychain_design")
 
@@ -108,7 +108,7 @@ def image_to_stl(
 def generate_image(prompt: str) -> str:
     """Generate an image using DALL·E and return the image URL."""
     response = openai.images.generate(
-        model="dall-e-2",
+        model=config.dalle_model,
         prompt=prompt,
         n=1,
         size="512x512",
@@ -126,7 +126,7 @@ def slice_stl(input_stl_path: str) ->  str:
     
     # Run PrusaSlicer in the command line
     command = (
-        f"{prusa_slicer_path} {prusa_settings} "
+        f"{config.prusa_slicer_path} {config.prusa_settings} "
         f"--output {output_gcode_path} {input_stl_path}"
     )
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -189,7 +189,7 @@ def generate_keychain_gcode_tool(stl_path: str) -> str:
 # main function, call image_to_stl
 if __name__ == "__main__":
     # input_image_path = "agents/keychain-design/564ebab1.png"
-    output_stl_path = "d6b42602.png"
+    output_stl_path = "ec73f72d.stl"
     # image_to_stl(input_image_path, output_stl_path)
-    output_gcode = generate_keychain_stl_tool(output_stl_path)
+    output_gcode = generate_keychain_gcode_tool(output_stl_path)
     print(output_gcode)

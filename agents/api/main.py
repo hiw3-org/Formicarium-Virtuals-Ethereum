@@ -9,7 +9,7 @@ app = FastAPI(
 )
 
 # Include the API routes
-app.include_router(api_router, prefix="/api")
+app.include_router(api_router, prefix="/agent")
 
 # Print the API routes in console
 for route in app.routes:
