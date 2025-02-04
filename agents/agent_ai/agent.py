@@ -16,7 +16,7 @@ from cdp_langchain.utils import CdpAgentkitWrapper
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-from agents.agent_ai.keychain_design_tools import generate_keychain_tool
+from agents.agent_ai.keychain_design_tools import generate_keychain_stl_tool, generate_image_tool, generate_keychain_gcode_tool
 from agents.agent_ai.prompts import agent_prompt_v0
 from agents.agent_ai.config import model, wallet_data_file
 
@@ -49,7 +49,7 @@ def initialize_agent():
 
     # Initialize CDP Agentkit Toolkit and get tools.
     cdp_toolkit = CdpToolkit.from_cdp_agentkit_wrapper(agentkit)
-    tools = cdp_toolkit.get_tools() + [generate_keychain_tool]
+    tools = cdp_toolkit.get_tools() + [generate_keychain_stl_tool, generate_image_tool, generate_keychain_gcode_tool]
 
     # Store buffered conversation history in memory.
     memory = MemorySaver()

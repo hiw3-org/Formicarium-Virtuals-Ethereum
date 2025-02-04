@@ -9,22 +9,13 @@ import cv2 as cv
 import hashlib
 import os
 import sys
+import subprocess
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
+from agents.agent_ai.config import prusa_slicer_path, prusa_settings
 
-def generate_image(prompt: str) -> str:
-    """Generate an image using DALL·E and return the image URL."""
-    response = openai.images.generate(
-        model="dall-e-2",
-        prompt=prompt,
-        n=1,
-        size="512x512",
-        response_format="url",
-    )
-    # Access the URL using attribute access
-    return response.data[0].url
-
+output_folder = Path("agents/keychain_design")
 
 def shorten_filename(prompt: str) -> str:
     hash_digest = hashlib.md5(prompt.encode()).hexdigest()[:8]  # Get the first 8 characters of the hash
@@ -114,9 +105,40 @@ def image_to_stl(
     final_mesh.export(output_stl_path)
     print(f"✅ STL file saved as {output_stl_path}")
 
+def generate_image(prompt: str) -> str:
+    """Generate an image using DALL·E and return the image URL."""
+    response = openai.images.generate(
+        model="dall-e-2",
+        prompt=prompt,
+        n=1,
+        size="512x512",
+        response_format="url",
+    )
+    # Access the URL using attribute access
+    return response.data[0].url
+
+def slice_stl(input_stl_path: str) ->  str:
+    """Slice an STL file using PrusaSlicer and save the output G-code file."""
+    output_gcode_path = input_stl_path.with_suffix(".gcode")
+    
+    input_stl_path = os.path.abspath(input_stl_path)
+    output_gcode_path = os.path.abspath(output_gcode_path)
+    
+    # Run PrusaSlicer in the command line
+    command = (
+        f"{prusa_slicer_path} {prusa_settings} "
+        f"--output {output_gcode_path} {input_stl_path}"
+    )
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+
+    if process.returncode != 0:
+        raise Exception(f"PrusaSlicer failed with error code {process.returncode}: {stderr.decode()}")
+
+    return output_gcode_path
 
 @tool
-def generate_keychain_tool(prompt: str) -> str:
+def generate_image_tool(prompt: str) -> str:
     """Generate a grayscale image based on the user's prompt and save it locally."""
     # Ensure the image is grayscale
     grayscale_prompt = f"{prompt} in grayscale"
@@ -126,28 +148,48 @@ def generate_keychain_tool(prompt: str) -> str:
     response = requests.get(image_url)
     if response.status_code != 200:
         raise Exception(f"Failed to download image: {response.status_code}")
-
+    
     # Save the image to a folder
-    output_folder = Path("agents/keychain_design")
     output_folder.mkdir(exist_ok=True)  # Create the folder if it doesn't exist
 
     # Sanitize the prompt to create a valid filename
     sanitized_prompt = "".join(c for c in prompt if c.isalnum() or c in (" ", "_")).rstrip()
-    image_path = Path("agents/keychain_design") / shorten_filename(sanitized_prompt)
+    image_path = output_folder / shorten_filename(sanitized_prompt)
 
     with open(image_path, "wb") as f:
         f.write(response.content)
+        
+    return str(image_path)  # Return the image path as a string
 
-    output_stl_path = Path("agents/keychain_design") / f"{Path(image_path).stem}.stl"
+
+@tool
+def generate_keychain_stl_tool(image_path: str) -> str:
+    """Generate a stlfile image based on the user's image and save it locally."""    
+    output_stl_path = output_folder / f"{Path(image_path).stem}.stl"
     output_stl_path.parent.mkdir(exist_ok=True)
+    
+    image_path = output_folder / f"{Path(image_path)}"
+    
 
     image_to_stl(image_path, str(output_stl_path))
 
     return str(image_path)  # Return the image path as a string
 
+@tool
+def generate_keychain_gcode_tool(stl_path: str) -> str:
+    """Generate a gcode file based on the user's stl file and save it locally."""
+    stl_path = output_folder / f"{Path(stl_path).stem}.stl"
+    stl_path.parent.mkdir(exist_ok=True)
+    
+    output_gcode = slice_stl(stl_path)
+
+    return str(output_gcode)
+
 
 # main function, call image_to_stl
 if __name__ == "__main__":
-    input_image_path = "agents/keychain-design/564ebab1.png"
-    output_stl_path = "agents/keychain-design/564ebab1.stl"
-    image_to_stl(input_image_path, output_stl_path)
+    # input_image_path = "agents/keychain-design/564ebab1.png"
+    output_stl_path = "d6b42602.png"
+    # image_to_stl(input_image_path, output_stl_path)
+    output_gcode = generate_keychain_stl_tool(output_stl_path)
+    print(output_gcode)

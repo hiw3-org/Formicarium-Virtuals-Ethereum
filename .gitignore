@@ -1,2 +1,10 @@
 venv/
 .vscode
+
+#Ignore pycache in all nested directories
+__pycache__/
+
+*.png
+*.stl
+*.gcode
+
