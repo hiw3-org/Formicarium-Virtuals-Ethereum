@@ -1,4 +1,12 @@
 venv/
 .vscode
 .idea/
-node_modules
+node_modules/
+
+#Ignore pycache in all nested directories
+__pycache__/
+
+*.png
+*.stl
+*.gcode
+

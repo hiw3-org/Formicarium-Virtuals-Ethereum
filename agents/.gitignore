@@ -3,3 +3,6 @@ node_modules
 .venv
 wallet_data.txt
 *.png
+
+__pycache__/
+__pycache__

@@ -1,22 +1,18 @@
 import os
-import requests
-from pathlib import Path
 import sys
 
 from dotenv import load_dotenv
 
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, ToolMessage
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
-from langchain.tools import tool
 
 from cdp_langchain.agent_toolkits import CdpToolkit
 from cdp_langchain.utils import CdpAgentkitWrapper
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
-
-from agents.agent_ai.keychain_design_tools import generate_keychain_tool
+from agents.agent_ai.keychain_design_tools import generate_keychain_stl_tool, generate_image_tool, generate_keychain_gcode_tool
 from agents.agent_ai.prompts import agent_prompt_v0
 from agents.agent_ai.config import model, wallet_data_file
 
@@ -49,7 +45,7 @@ def initialize_agent():
 
     # Initialize CDP Agentkit Toolkit and get tools.
     cdp_toolkit = CdpToolkit.from_cdp_agentkit_wrapper(agentkit)
-    tools = cdp_toolkit.get_tools() + [generate_keychain_tool]
+    tools = cdp_toolkit.get_tools() + [generate_keychain_stl_tool, generate_image_tool, generate_keychain_gcode_tool]
 
     # Store buffered conversation history in memory.
     memory = MemorySaver()
@@ -64,7 +60,6 @@ def initialize_agent():
     ), config_llm
 
 
-# Chat Mode
 def run_chat_mode(agent_executor, config):
     """Run the agent interactively based on user input."""
     print("Starting chat mode... Type 'exit' to end.")
@@ -78,9 +73,7 @@ def run_chat_mode(agent_executor, config):
             for chunk in agent_executor.stream({"messages": [HumanMessage(content=user_input)]}, config):
                 if "agent" in chunk:
                     print(chunk["agent"]["messages"][0].content)
-                elif "tools" in chunk:
-                    print(chunk["tools"]["messages"][0].content)
-                print("-------------------")
+            print("-------------------")
 
         except KeyboardInterrupt:
             print("Goodbye Agent!")
@@ -89,21 +82,26 @@ def run_chat_mode(agent_executor, config):
 
 def chat_with_agent(user_input, agent_executor, config):
     """Run the agent interactively based on user request."""
-    while True:
-        try:
-            if user_input.lower() == "exit":
-                break
+    try:
+        # Initialize the message history with the user's input
+        messages = [HumanMessage(content=user_input)]
 
-            # Run agent with the user's input in chat mode
-            for chunk in agent_executor.stream({"messages": [HumanMessage(content=user_input)]}, config):
-                if "agent" in chunk:
-                    return chunk["agent"]["messages"][0].content
-                elif "tools" in chunk:
-                    return chunk["tools"]["messages"][0].content
+        # Stream the agent's response
+        for chunk in agent_executor.stream({"messages": messages}, config):
+            if "agent" in chunk:
+                # Handle agent messages
+                agent_message = chunk["agent"]["messages"][0]
+                messages.append(agent_message)
 
-        except KeyboardInterrupt:
-            print("Goodbye Agent!")
-            sys.exit(0)
+            elif "tools" in chunk:
+                tool_message = chunk["tools"]["messages"][0]
+                messages.append(tool_message)
+
+        # Return the final response from the agent
+        return messages[-1].content
+
+    except Exception as e:
+        raise Exception(f"Error processing request: {str(e)}")
 
 
 def run_agent():
@@ -113,5 +111,4 @@ def run_agent():
 
 
 if __name__ == "__main__":
-    print("Starting Agent...")
     run_agent()
