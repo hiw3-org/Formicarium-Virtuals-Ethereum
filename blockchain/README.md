@@ -1,13 +1,8 @@
-# Sample Hardhat Project
+# Blockchain
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+This directory contains code related to the development of smart contracts.
 
-Try running some of the following tasks:
+## 📜 Smart Contract Address - Base Sepolia (testnet)
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.js
-```
+- **Formicarium Contract:** [`0xE2BBceBC540bEF2e1d76dD3154Bd94Bf1846b705`](https://sepolia-explorer.base.org/address/0xE2BBceBC540bEF2e1d76dD3154Bd94Bf1846b705)
+- **ERC20 Token Contract:** [`0x3207249ba95035b067D9700A5d221531A6eA3BcB`](https://sepolia-explorer.base.org/address/0x3207249ba95035b067D9700A5d221531A6eA3BcB)
