@@ -95,15 +95,14 @@ def image_to_stl(
     # Generate STL mesh and save file
     final_mesh = create_mesh_from_heightmap(height_map)
 
-    # **Scale down the STL to fit within max 3D printer dimensions**
-    current_size = final_mesh.extents  # Get the size of the mesh (width, depth, height)
-    scale_factors = [max_dim / cur_dim for max_dim, cur_dim in zip(max_dimensions, current_size)]
-    scale_factor = min(scale_factors)  # Use the smallest factor to keep proportions
+    # # **Scale down the STL to fit within max 3D printer dimensions**
+    # current_size = final_mesh.extents  # Get the size of the mesh (width, depth, height)
+    # scale_factors = [max_dim / cur_dim for max_dim, cur_dim in zip(max_dimensions, current_size)]
+    # scale_factor = min(scale_factors)  # Use the smallest factor to keep proportions
 
-    final_mesh.apply_scale(scale_factor)  # Apply uniform scaling
+    # final_mesh.apply_scale(scale_factor)  # Apply uniform scaling
 
     final_mesh.export(output_stl_path)
-    print(f"✅ STL file saved as {output_stl_path}")
 
 def generate_image(prompt: str) -> str:
     """Generate an image using DALL·E and return the image URL."""
@@ -117,7 +116,7 @@ def generate_image(prompt: str) -> str:
     # Access the URL using attribute access
     return response.data[0].url
 
-def slice_stl(input_stl_path: str) ->  str:
+def slice_stl(input_stl_path: str, box_size=[100,100,100]) ->  str:
     """Slice an STL file using PrusaSlicer and save the output G-code file."""
     output_gcode_path = input_stl_path.with_suffix(".gcode")
     
@@ -126,8 +125,9 @@ def slice_stl(input_stl_path: str) ->  str:
     
     # Run PrusaSlicer in the command line
     command = (
-        f"{config.prusa_slicer_path} {config.prusa_settings} "
-        f"--output {output_gcode_path} {input_stl_path}"
+        f"{config.prusa_slicer_path} {config.prusa_settings}"
+        f"--scale-to-fit {box_size[0]},{box_size[1]},{box_size[2]} "
+        f"--output {output_gcode_path} {input_stl_path} "
     )
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
@@ -176,20 +176,29 @@ def generate_keychain_stl_tool(image_path: str) -> str:
     return str(image_path)  # Return the image path as a string
 
 @tool
-def generate_keychain_gcode_tool(stl_path: str) -> str:
+def generate_keychain_gcode_tool(stl_path: str, box_size=[100,100,100]) -> str:
     """Generate a gcode file based on the user's stl file and save it locally."""
     stl_path = output_folder / f"{Path(stl_path).stem}.stl"
     stl_path.parent.mkdir(exist_ok=True)
     
-    output_gcode = slice_stl(stl_path)
+    output_gcode = slice_stl(stl_path, box_size)
 
     return str(output_gcode)
 
 
 # main function, call image_to_stl
 if __name__ == "__main__":
-    # input_image_path = "agents/keychain-design/564ebab1.png"
-    output_stl_path = "ec73f72d.stl"
-    # image_to_stl(input_image_path, output_stl_path)
-    output_gcode = generate_keychain_gcode_tool(output_stl_path)
-    print(output_gcode)
+    # # input_image_path = "agents/keychain-design/564ebab1.png"
+    # output_stl_path = "9d15cd21.stl"
+    # stl_path = output_folder / f"{Path(output_stl_path).stem}.stl"
+    # stl_path.parent.mkdir(exist_ok=True)
+    # # image_to_stl(input_image_path, output_stl_path)
+    # output_gcode = slice_stl(stl_path, [50,50,50])
+    # print(output_gcode)
+    # input_img = "agents/keychain_design/9d15cd21.png"
+    output_stl_path = "agents/keychain_design/9d15cd21_test.stl"
+    stl_path = output_folder / f"{Path(output_stl_path).stem}.stl"
+    slice_stl(stl_path, box_size=[100,100,100])
+    # image_to_stl(input_img, output_stl_path)
+    
+    
