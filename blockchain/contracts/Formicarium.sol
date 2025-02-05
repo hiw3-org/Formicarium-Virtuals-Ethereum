@@ -1,15 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-// Uncomment this line to use console.log
-// import "hardhat/console.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-interface IERC20 {
-    function transfer(address recipient, uint256 amount) external returns (bool);
-    function balanceOf(address account) external view returns (uint256);
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
-    function allowance(address owner, address spender) external view returns (uint256);
-}
+// Uncomment this line to use console.log
+import "hardhat/console.sol";
 
 contract Formicarium {
     address public owner;
@@ -25,8 +20,8 @@ contract Formicarium {
         address ID;
         address printerId;
         address customerId;
-        uint256 initialPrice;
-        uint256 currentPrice;
+        uint256 minimalPrice;
+        uint256 actualPrice;
         uint256 duration;
         uint256 startTime;
         uint256 expirationTime;
@@ -80,23 +75,25 @@ contract Formicarium {
         printerAddresses.push(msg.sender);
     }
 
-    function createOrder(address _orderId, address _printerId, uint256 _price, uint256 _duration) public {
+    function createOrder(address _orderId, address _printerId, uint256 _minimalPrice, uint256 _actualPrice, uint256 _duration) public {
         require(orders[_orderId].ID == address(0), "Order already exists");
+        require(_orderId != address(0), "Invalid order ID");
         require(printers[_printerId].ID == _printerId, "Printer does not exist");
-        require(_price > 0, "Price must be greater than 0");
+        require(_minimalPrice > 0, "Price must be greater than 0");
+        require(_actualPrice >= _minimalPrice, "Actual price must be greater than or equal to minimal price");
         require(_duration > 0, "Duration must be greater than 0");
-        require(paymentToken.balanceOf(msg.sender) >= _price, "Insufficient balance");
+        require(paymentToken.balanceOf(msg.sender) >= _actualPrice, "Insufficient balance");
 
         // Ensure sender has approved enough tokens for transfer
-        require(paymentToken.allowance(msg.sender, address(this)) >= _price, "Contract not approved to transfer tokens");
+        require(paymentToken.allowance(msg.sender, address(this)) >= _actualPrice, "Contract not approved to transfer tokens");
 
         // Transfer tokens from user to smart contract
-        require(paymentToken.transferFrom(msg.sender, address(this), _price), "Token transfer failed");
+        require(paymentToken.transferFrom(msg.sender, address(this), _actualPrice), "Token transfer failed");
 
         // remove expired orders
         removeExpiredOrders(_printerId);
 
-        orders[_orderId] = Order(_orderId, _printerId, msg.sender, _price, 0, _duration, 0, block.timestamp + 5 minutes, false, false, true);
+        orders[_orderId] = Order(_orderId, _printerId, msg.sender, _minimalPrice, _actualPrice, _duration, 0, block.timestamp + 5 minutes, false, false, false);
         providerOrders[_printerId].push(_orderId);
     }
 
@@ -163,7 +160,7 @@ contract Formicarium {
         // calculate the priority factor for each order
         uint256[] memory priorityFactors = new uint256[](activeOrders.length);
         for (uint256 i = 0; i < activeOrders.length; i++) {
-            priorityFactors[i] = activeOrders[i].currentPrice / activeOrders[i].initialPrice;
+            priorityFactors[i] = activeOrders[i].actualPrice / activeOrders[i].minimalPrice;
         }
         // find the order with the highest priority factor
         uint256 maxPriority = 0;
@@ -199,7 +196,7 @@ contract Formicarium {
         require(orders[_orderId].customerId == msg.sender, "Only customer can confirm order");
         require(orders[_orderId].isSigned, "Order not signed");
         require(orders[_orderId].isCompletedProvider, "Order not completed by provider");
-        require(orders[_orderId].isUncompleteCustomer, "Order already reported as uncomplete by customer");
+        require(!orders[_orderId].isUncompleteCustomer, "Order already reported as uncomplete by customer");
         require(block.timestamp < orders[_orderId].startTime + orders[_orderId].duration + 5 minutes, "Report time expired");
 
         orders[_orderId].isUncompleteCustomer = false;
@@ -212,7 +209,7 @@ contract Formicarium {
         require(block.timestamp >= orders[_orderId].expirationTime, "Order request is not expired yet");
 
         // Transfer tokens back to customer
-        require(paymentToken.transfer(msg.sender, orders[_orderId].initialPrice), "Token transfer failed");
+        paymentToken.transfer(msg.sender, orders[_orderId].actualPrice);
 
         // Free storage
         delete orders[_orderId];
@@ -227,7 +224,7 @@ contract Formicarium {
         require(block.timestamp >= orders[_orderId].startTime + orders[_orderId].duration + 5 minutes, "Reporting time not expired yet");
 
         // Transfer funds to provider
-        require(paymentToken.transfer(msg.sender, orders[_orderId].initialPrice), "Token transfer failed");
+        require(paymentToken.transfer(msg.sender, orders[_orderId].actualPrice), "Token transfer failed");
 
         // Free storage
         delete orders[_orderId];
