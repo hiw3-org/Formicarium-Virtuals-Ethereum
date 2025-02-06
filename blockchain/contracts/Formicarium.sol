@@ -13,7 +13,7 @@ contract Formicarium {
     struct Printer {
         address ID;
         string printerDetails;
-        address currentOrderId;
+        address currentOrderId; //TODO USE IT!
     }
 
     struct Order {

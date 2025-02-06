@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/home/nejc/Projects/formicarium/blockchain/contracts/Formicarium.sol": {
-      "lastModificationDate": 1738757093585,
-      "contentHash": "ddcdb31adbbcba8ed2571cba180abfe3",
+      "lastModificationDate": 1738779013608,
+      "contentHash": "feeac324921533aea775bcec1074930e",
       "sourceName": "contracts/Formicarium.sol",
       "solcConfig": {
         "version": "0.8.28",
