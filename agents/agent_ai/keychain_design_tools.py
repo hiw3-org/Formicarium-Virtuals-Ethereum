@@ -185,6 +185,12 @@ def generate_keychain_gcode_tool(stl_path: str, box_size=[100,100,100]) -> str:
 
     return str(output_gcode)
 
+# DEV: Temp
+@tool
+def get_ofer(gcode_path: str) -> str:
+    """Get the price and time estimate for the 3D print."""
+    return "The quickest print will cost you 5$ and will be ready in 2 hours wit printer 2341, the cheapest print will cost you 2$ and will be ready in 3 days, with printer 2342"
+
 
 # main function, call image_to_stl
 if __name__ == "__main__":
