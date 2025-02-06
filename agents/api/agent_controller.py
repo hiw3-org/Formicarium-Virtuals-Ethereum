@@ -8,13 +8,11 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-from agents.agent_ai.agent import chat_with_agent, initialize_agent, get_or_create_agent, cleanup_inactive_agents
-
-# Initialize the agent
-agent_executor, config = initialize_agent()
+from agents.agent_ai.agent import chat_with_agent, get_or_create_agent, cleanup_inactive_agents
 
 # Request model for the chat endpoint
 class ChatRequest(BaseModel):
+    user_id: int
     prompt: str
 
 # Response model for the chat endpoint
@@ -22,41 +20,38 @@ class FileData(BaseModel):
     filename: str
     content: str  # Base64-encoded content
     content_type: str
+    
+class ChatHistoryItem(BaseModel):
+    role: str  # 'user' or 'agent'
+    message: str
 
 # Response model for the chat endpoint
 class ChatResponse(BaseModel):
     response: str
     stl_file: Optional[FileData] = None
     image_file: Optional[FileData] = None
+    chat_history: list[ChatHistoryItem] = None
     
-    
-def fetch_api_key_from_header(req: Request) -> str:
-    """
-    Fetch the API key from the request headers.
-    """
-    if "api-key" in req.headers:
-        return req.headers["api-key"]
-    else:
-        raise HTTPException(status_code=401, detail="No API key provided")
 
-
-
-def process_chat_request(request: ChatRequest, req: Request, background_tasks: BackgroundTasks) -> ChatResponse:
+def process_chat_request(request: ChatRequest, background_tasks: BackgroundTasks) -> ChatResponse:
     """
     Handle the chat request and return a structured response.
     """
     try:        
-        # Fetch the API key from the headers
-        api_key = fetch_api_key_from_header(req)
     
         # Get or create the agent for the user
-        agent_data = get_or_create_agent(api_key)
+        agent_data = get_or_create_agent(request.user_id)
         agent_executor = agent_data["agent_executor"]
         config = agent_data["config"]  # Retrieve the config
+        history = agent_data["history"]  # Retrieve the conversation history
         
+        # Append the user's prompt to history
+        history.append({"role": "user", "message": request.prompt})
         
         # Call the agent with the user's prompt
         result = chat_with_agent(request.prompt, agent_executor, config)
+        
+        history.append({"role": "agent", "message": result})
 
         # Extract file references from the response
         file_pattern = re.compile(r'!\[.*?\]\((.*?)\)')
@@ -91,7 +86,10 @@ def process_chat_request(request: ChatRequest, req: Request, background_tasks: B
         cleaned_response = file_pattern.sub('', result).strip()
         cleaned_response = cleaned_response.replace("\n\n", "\n").strip()
 
-        return ChatResponse(response=cleaned_response, stl_file=stl_file, image_file=image_file)
+        return ChatResponse(response=cleaned_response, 
+                            stl_file=stl_file, 
+                            image_file=image_file,
+                            chat_history=history)
 
     except Exception as e:
         raise ValueError(f"Error processing request: {str(e)}")

@@ -15,12 +15,10 @@ app.include_router(api_router, prefix="/agent")
 for route in app.routes:
     print(route)
 
-
 # Root endpoint
 @app.get("/")
 async def root():
     return {"message": "Welcome to the Agent AI API!"}
-
 
 # Run the FastAPI app
 if __name__ == "__main__":
