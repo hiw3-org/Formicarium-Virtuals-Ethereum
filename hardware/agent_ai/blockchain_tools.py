@@ -110,6 +110,7 @@ async def handle_event(event):
         if event['args']['printerId'] == printer_address:
             print(f"Arguments: {event['args']}")
             # SPROŽIMO NASLEDNJI ORDER
+            # - Kličemo OctoPrint API da preverimo stanje
             # - Kličemo SC za izvedbo naslednjega naročila
     
     elif event['event'] == "OrderStarted":

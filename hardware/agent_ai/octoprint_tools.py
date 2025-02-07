@@ -44,6 +44,30 @@ def start_printing(file_name):
         raise Exception(f"❌ Error starting print: {response.text}")
 
     print("🚀 Print started successfully!")
+    
+
+### **🔄 Optimized Printer Status Retrieval Function**
+def get_octoprint_status():
+    """Makes a single GET request to OctoPrint API and returns the printer state."""
+    try:
+        # Request printer state (single GET request)
+        response = requests.get(
+            f"{OCTOPRINT_API_URL}/printer",
+            headers={"X-Api-Key": OCTOPRINT_API_KEY}
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            return data["state"]["text"].lower()  # Return state as lowercase string
+
+        else:
+            print(f"⚠️ OctoPrint API error: {response.text}")
+            return None  # Return None in case of an error
+
+    except Exception as e:
+        print(f"❌ Error retrieving OctoPrint status: {e}")
+        return None  # Return None if an exception occurs
+
 
 
 ### **🔄 Polling Function to Check Printer Status**

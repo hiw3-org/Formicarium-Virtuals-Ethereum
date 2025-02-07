@@ -48,4 +48,3 @@ async def generate_camera_stream():
 async def stream_camera():
     """FastAPI endpoint to proxy the camera stream."""
     return StreamingResponse(generate_camera_stream(), media_type="multipart/x-mixed-replace; boundary=frame")
-
