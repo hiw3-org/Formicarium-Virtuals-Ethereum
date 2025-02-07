@@ -2,8 +2,10 @@ import SupabaseProvider from './supabase-provider';
 import { PropsWithChildren } from 'react';
 import '@/styles/globals.css';
 import { ThemeProvider } from './theme-provider';
+import { Anybody } from 'next/font/google';
 
 export const dynamic = 'force-dynamic';
+const anybody = Anybody({ subsets: ['latin'], weight: ['400', '700'] });
 
 export default function RootLayout({
   // Layouts must accept a children prop.
@@ -70,7 +72,7 @@ export default function RootLayout({
         <link rel="canonical" href="https://your-website.com" />
         <link rel="icon" href="/img/favicon.ico" />
       </head>
-      <body id={'root'} className="loading bg-white">
+      <body id={'root'} className={`${anybody.className} loading bg-white`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <SupabaseProvider>
             <main id="skip">{children}</main>
