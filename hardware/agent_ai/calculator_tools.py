@@ -1,5 +1,9 @@
 import re
 import math
+import json
+import sys
+import os
+from langchain.tools import tool
 
 # Fixed settings for Prusa MK3
 PRINTER_SETTINGS = {
@@ -55,6 +59,7 @@ def extract_filament_length(gcode_file):
 
 # ====================== TIME ============================
 
+@tool("estimate_print_time", return_direct=True)
 def estimate_print_time(gcode_file):
     """Estimates print time in hours based on G-code movement commands."""
     
@@ -111,7 +116,7 @@ def estimate_print_time(gcode_file):
     return estimated_time / 3600  # Convert seconds to hours
 
 # ==========================================================
-
+@tool("calculate_3d_printing_cost", return_direct=True)
 def calculate_3d_printing_cost(gcode_file, PRINTER_SETTINGS=PRINTER_SETTINGS, MATERIAL_SETTINGS=MATERIAL_SETTINGS, COST_FACTORS=COST_FACTORS):
     """Calculates the cost of 3D printing using fixed Prusa MK3 settings."""
     filament_length_mm = extract_filament_length(gcode_file)

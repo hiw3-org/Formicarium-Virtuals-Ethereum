@@ -2,6 +2,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 import httpx
+from hardware.api.agent_controller import ChatRequest, ChatResponse, process_chat_request
 
 router = APIRouter()
 
@@ -48,4 +49,17 @@ async def generate_camera_stream():
 async def stream_camera():
     """FastAPI endpoint to proxy the camera stream."""
     return StreamingResponse(generate_camera_stream(), media_type="multipart/x-mixed-replace; boundary=frame")
+
+
+@router.post("/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest):
+
+    """
+    Endpoint for handling chat requests.
+    """
+    try:
+        response = process_chat_request(request)
+        return response
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
 

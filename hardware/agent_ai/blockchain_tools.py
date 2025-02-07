@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 import json
 import asyncio
+from langchain.tools import tool
 
 load_dotenv()
 
@@ -21,8 +22,13 @@ printer_address = os.getenv("ADDRESS")
 private_key = os.getenv("PRIVATE_KEY")
 contract = web3.eth.contract(address=contract_address, abi=abi)
 
-# Function to sign an order
+@tool("sign_order", return_direct=True)
 def sign_order(order_id):
+    """SIgn an order with the provided ID.
+
+    Args:
+        order_id (_type_): _description_
+    """
     try:
         nonce = web3.eth.get_transaction_count(printer_address)
         tx = contract.functions.signOrder(order_id).build_transaction({
@@ -41,7 +47,10 @@ def sign_order(order_id):
         print(f"Error signing order {order_id}: {e}")
 
 # Function to execute a new order
+@tool("execute_new_order", return_direct=True)
 def execute_new_order():
+    """Execute a new order.
+    """
     try:
         nonce = web3.eth.get_transaction_count(printer_address)
         tx = contract.functions.executeNewOrder().build_transaction({
@@ -60,7 +69,13 @@ def execute_new_order():
         print(f"❌ Error executing new order: {e}")
 
 # Function to complete an order as a provider
+@tool("complete_order_provider", return_direct=True)
 def complete_order_provider(order_id):
+    """Complete an order as a provider.
+
+    Args:
+        order_id (_type_): _description_
+    """
     try:
         nonce = web3.eth.get_transaction_count(printer_address)
         tx = contract.functions.completeOrderProvider(order_id).build_transaction({
@@ -79,7 +94,13 @@ def complete_order_provider(order_id):
         print(f"❌ Error completing order {order_id}: {e}")
 
 # Function to transfer funds to the provider
+@tool("transfer_funds_provider", return_direct=True)
 def transfer_funds_provider(order_id):
+    """Transfer funds to the provider.
+
+    Args:
+        order_id (_type_): _description_
+    """
     try:
         nonce = web3.eth.get_transaction_count(printer_address)
         tx = contract.functions.transferFundsProivder(order_id).build_transaction({
