@@ -2,8 +2,12 @@ import SupabaseProvider from './supabase-provider';
 import { PropsWithChildren } from 'react';
 import '@/styles/globals.css';
 import { ThemeProvider } from './theme-provider';
+import { Anybody } from 'next/font/google';
+import Navbar from "@/components/navbar/Navbar";
+import {GlobalProvider} from "@/contexts/GlobalContext";
 
 export const dynamic = 'force-dynamic';
+const anybody = Anybody({ subsets: ['latin'], weight: ['400', '700'] });
 
 export default function RootLayout({
   // Layouts must accept a children prop.
@@ -70,11 +74,21 @@ export default function RootLayout({
         <link rel="canonical" href="https://your-website.com" />
         <link rel="icon" href="/img/favicon.ico" />
       </head>
-      <body id={'root'} className="loading bg-white">
+      <body id={'root'} className={`${anybody.className} loading bg-white`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <SupabaseProvider>
-            <main id="skip">{children}</main>
-          </SupabaseProvider>
+          <GlobalProvider>
+            <Navbar brandText="formicarium"/>
+            {/* Background applied to all pages */}
+            <div className="relative w-screen min-h-screen bg-repeat bg-top pt-16"
+                 style={{backgroundImage: "url('/background.png')", backgroundSize: "auto"}}>
+
+              {/* Dark Overlay */}
+              <div className="absolute inset-0 bg-black opacity-60"></div>
+
+              {/* Content needs to be relative to stay above overlay */}
+              <main className="relative container mx-auto px-6 py-10">{children}</main>
+            </div>
+            </GlobalProvider>
         </ThemeProvider>
       </body>
     </html>

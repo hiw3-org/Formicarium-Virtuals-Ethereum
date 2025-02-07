@@ -4,8 +4,8 @@
 import {Button} from "@/components/ui/button";
 import Navbar from "@/components/navbar/Navbar";
 import Chat from "@/components/chat/chat";
-import Model2dApproval from "@/components/approvalBox/model2d";
-import ModelSTLApproval from "@/components/approvalBox/modelSTL";
+import OrderSummary from "@/components/card/OrderSummary";
+import ApproveCard from "@/components/card/Approve";
 
 interface Props {
 }
@@ -34,26 +34,46 @@ export default function Home(props: Props) {
 
             {/* Background Section */}
             <div
-                className="w-screen h-screen bg-center bg-repeat pt-16"
+                className="w-screen min-h-screen bg-center bg-repeat pt-16"
                 style={{backgroundImage: "url('/background.png')"}}
             >
 
                 <div className="container mx-auto px-6 py-10">
-                    <div className="grid grid-cols-2 md:grid-cols-3 ">
+                    <div className="grid grid-cols-2 gap-8 ">
                         {/* Left Column (Transparent) */}
-                        <div className="bg-transparent md:col-span-2 p-0 rounded-lg shadow-md">
+                        <div className="bg-transparent md:col-span-1 p-0 rounded-lg shadow-md">
                             <Chat responses={predefinedResponses}/>;
                         </div>
 
                         {/* Right Column (Image & Buttons) */}
-                        <div className="md:col-span-1 ">
-                            <Model2dApproval imageSrc={"/model2d.png"} onApprove={handleApprove}
-                                             onReject={handleReject}/>
-                            <ModelSTLApproval
-                                modelSrc="/models/20mm_cube.stl" // Path to your STL file
+                        <div className="md:col-span-1 w-6/7 max-w-lg min-w-[400px]">
+                            <div className="pb-5">
+                            <ApproveCard
+                                imageSrc={"/approve2DBackground.png"}
                                 onApprove={handleApprove}
                                 onReject={handleReject}
+                                text="Use chat to generate an image?"
                             />
+                            </div>
+                            <div className="pb-5">
+                            <ApproveCard
+                                imageSrc={"/approveSTLBackground.png"}
+                                onApprove={handleApprove}
+                                onReject={handleReject}
+                                text="You need an image to generate a model?"
+                            />
+                            </div>
+                            <div className="pb-5">
+                            <OrderSummary
+                                onApprove={handleApprove}
+                                dimensions={[10, 20, 30]}
+                                quantity={5}
+                                price={100}
+                                fee={10}
+                            />
+                            </div>
+
+
                         </div>
                     </div>
                 </div>
