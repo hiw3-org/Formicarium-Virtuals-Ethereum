@@ -4,6 +4,7 @@ import '@/styles/globals.css';
 import { ThemeProvider } from './theme-provider';
 import { Anybody } from 'next/font/google';
 import Navbar from "@/components/navbar/Navbar";
+import {GlobalProvider} from "@/contexts/GlobalContext";
 
 export const dynamic = 'force-dynamic';
 const anybody = Anybody({ subsets: ['latin'], weight: ['400', '700'] });
@@ -75,7 +76,7 @@ export default function RootLayout({
       </head>
       <body id={'root'} className={`${anybody.className} loading bg-white`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <SupabaseProvider>
+          <GlobalProvider>
             <Navbar brandText="formicarium"/>
             {/* Background applied to all pages */}
             <div className="relative w-screen min-h-screen bg-repeat bg-top pt-16"
@@ -87,7 +88,7 @@ export default function RootLayout({
               {/* Content needs to be relative to stay above overlay */}
               <main className="relative container mx-auto px-6 py-10">{children}</main>
             </div>
-          </SupabaseProvider>
+            </GlobalProvider>
         </ThemeProvider>
       </body>
     </html>

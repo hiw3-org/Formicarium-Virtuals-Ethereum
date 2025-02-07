@@ -3,8 +3,10 @@ import Chat from "@/components/chat/chat";
 import OrderSummary from "@/components/card/OrderSummary";
 import ApproveCard from "@/components/card/Approve";
 import {Syncopate} from "next/font/google";
+import {useEffect} from "react";
 
 const syncopate = Syncopate({ weight: "700", subsets: ["latin"] });
+
 
 export default function ChatPage() {
     return (
