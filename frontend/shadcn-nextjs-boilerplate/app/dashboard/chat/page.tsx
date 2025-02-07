@@ -7,6 +7,12 @@ import {useEffect} from "react";
 
 const syncopate = Syncopate({ weight: "700", subsets: ["latin"] });
 
+//Import global context
+
+useEffect(() => {
+
+}, []);
+
 
 export default function ChatPage() {
     return (
