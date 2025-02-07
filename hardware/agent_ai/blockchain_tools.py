@@ -18,8 +18,84 @@ web3 = Web3(Web3.HTTPProvider(RPC_URL))
 
 contract_address = os.getenv("FORMICARIUM_TEST_ADDRESS")
 printer_address = os.getenv("ADDRESS")
+private_key = os.getenv("PRIVATE_KEY")
 contract = web3.eth.contract(address=contract_address, abi=abi)
 
+# Function to sign an order
+def sign_order(order_id):
+    try:
+        nonce = web3.eth.get_transaction_count(printer_address)
+        tx = contract.functions.signOrder(order_id).build_transaction({
+            'from': printer_address,
+            'gas': 200000,
+            'gasPrice': web3.eth.gas_price,
+            'nonce': nonce
+        })
+
+        signed_tx = web3.eth.account.sign_transaction(tx, private_key)
+        tx_hash = web3.eth.send_raw_transaction(signed_tx.rawTransaction)
+
+        print(f"Order {order_id} signed! Transaction hash: {web3.to_hex(tx_hash)}")
+
+    except Exception as e:
+        print(f"Error signing order {order_id}: {e}")
+
+# Function to execute a new order
+def execute_new_order():
+    try:
+        nonce = web3.eth.get_transaction_count(printer_address)
+        tx = contract.functions.executeNewOrder().build_transaction({
+            'from': printer_address,
+            'gas': 200000,
+            'gasPrice': web3.eth.gas_price,
+            'nonce': nonce
+        })
+
+        signed_tx = web3.eth.account.sign_transaction(tx, private_key)
+        tx_hash = web3.eth.send_raw_transaction(signed_tx.rawTransaction)
+
+        print(f"🚀 New order executed! Transaction hash: {web3.to_hex(tx_hash)}")
+
+    except Exception as e:
+        print(f"❌ Error executing new order: {e}")
+
+# Function to complete an order as a provider
+def complete_order_provider(order_id):
+    try:
+        nonce = web3.eth.get_transaction_count(printer_address)
+        tx = contract.functions.completeOrderProvider(order_id).build_transaction({
+            'from': printer_address,
+            'gas': 200000,
+            'gasPrice': web3.eth.gas_price,
+            'nonce': nonce
+        })
+
+        signed_tx = web3.eth.account.sign_transaction(tx, private_key)
+        tx_hash = web3.eth.send_raw_transaction(signed_tx.rawTransaction)
+
+        print(f"✅ Order {order_id} completed! Transaction hash: {web3.to_hex(tx_hash)}")
+
+    except Exception as e:
+        print(f"❌ Error completing order {order_id}: {e}")
+
+# Function to transfer funds to the provider
+def transfer_funds_provider(order_id):
+    try:
+        nonce = web3.eth.get_transaction_count(printer_address)
+        tx = contract.functions.transferFundsProivder(order_id).build_transaction({
+            'from': printer_address,
+            'gas': 200000,
+            'gasPrice': web3.eth.gas_price,
+            'nonce': nonce
+        })
+
+        signed_tx = web3.eth.account.sign_transaction(tx, private_key)
+        tx_hash = web3.eth.send_raw_transaction(signed_tx.rawTransaction)
+
+        print(f"💰 Funds transferred for order {order_id}! Transaction hash: {web3.to_hex(tx_hash)}")
+
+    except Exception as e:
+        print(f"❌ Error transferring funds for order {order_id}: {e}")
 
 # Event Handler
 async def handle_event(event):
@@ -27,11 +103,22 @@ async def handle_event(event):
         if event['args']['printerId'] == printer_address:
             print(f"Arguments: {event['args']}")
             # SPROŽIMO POSTOPEK PODPISA NAROČILA
+            # - Prvo pogledamo ali parametri naročila ustrezajo (enako kot pri API klicu)
+            # - Podpišemo na SC
+
+    if event['event'] == "OrderCompleted":
+        if event['args']['printerId'] == printer_address:
+            print(f"Arguments: {event['args']}")
+            # SPROŽIMO NASLEDNJI ORDER
+            # - Kličemo SC za izvedbo naslednjega naročila
     
     elif event['event'] == "OrderStarted":
         if event['args']['printerId'] == printer_address:
             print(f"Arguments: {event['args']}")
             # SPROŽIMO POSTOPEK TISKANJA
+            # - Najdemo Gkodo
+            # - Pošljemo Gkodo na printer
+            # - Poženemo tiskanje
 
 
 # Async Listener for Multiple Events

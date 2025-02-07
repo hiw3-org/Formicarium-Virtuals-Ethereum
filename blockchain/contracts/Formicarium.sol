@@ -251,7 +251,7 @@ contract Formicarium {
         delete orders[_orderId];
     }
 
-    function transferFundsProivder(address _orderId) public {
+    function transferFundsProvider(address _orderId) public {
         require(orders[_orderId].ID == _orderId, "Order does not exist");
         require(orders[_orderId].printerId == msg.sender, "Only service provider can transfer funds");
         require(orders[_orderId].isSigned, "Order not signed");
