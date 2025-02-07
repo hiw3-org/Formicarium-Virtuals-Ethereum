@@ -55,6 +55,13 @@ contract Formicarium {
         paymentToken = IERC20(_paymentToken);
     }
 
+    // Events
+
+    event OrderCreated(address indexed orderId, address indexed printerId, uint256 minimalPrice, uint256 actualPrice, uint256 duration);
+    event OrderSigned(address indexed orderId, address indexed printerId);
+    event OrderStarted(address indexed orderId, address indexed printerId);
+    event OrderCompleted(address indexed orderId, address indexed printerId);
+
     // Functions
 
     // Getter functions
@@ -65,6 +72,30 @@ contract Formicarium {
             allPrinters[i] = printers[printerAddresses[i]];
         }
         return allPrinters;
+    }
+
+    function getYourOrders() public view returns (Order[] memory) {
+        uint256 count = 0;
+        address[] memory allOrders = new address[](printerAddresses.length);
+        
+        // Count the number of orders placed by the caller
+        for (uint256 i = 0; i < printerAddresses.length; i++) {
+            address printer = printerAddresses[i];
+            address[] storage providerOrderList = providerOrders[printer];
+            for (uint256 j = 0; j < providerOrderList.length; j++) {
+                if (orders[providerOrderList[j]].customerId == msg.sender) {
+                    allOrders[count] = providerOrderList[j];
+                    count++;
+                }
+            }
+        }
+        // Create an array with the correct size
+        Order[] memory customerOrders = new Order[](count);
+        for (uint256 k = 0; k < count; k++) {
+            customerOrders[k] = orders[allOrders[k]];
+        }
+        
+        return customerOrders;
     }
 
     // Setter functions
@@ -95,6 +126,8 @@ contract Formicarium {
 
         orders[_orderId] = Order(_orderId, _printerId, msg.sender, _minimalPrice, _actualPrice, _duration, 0, block.timestamp + 5 minutes, false, false, false);
         providerOrders[_printerId].push(_orderId);
+
+        emit OrderCreated(_orderId, _printerId, _minimalPrice, _actualPrice, _duration);
     }
 
     function getActiveOrders() public view returns (Order[] memory) {
@@ -148,6 +181,7 @@ contract Formicarium {
         
         removeExpiredOrders(msg.sender);
         orders[_orderId].isSigned = true;
+        emit OrderSigned(_orderId, msg.sender);
     }
 
     function calculateNextOrderId() internal view returns (address) {
@@ -179,6 +213,7 @@ contract Formicarium {
         address _orderId = calculateNextOrderId();
         require(_orderId != address(0), "No active orders to execute");
         orders[_orderId].startTime = block.timestamp;
+        emit OrderStarted(_orderId, msg.sender);
     }
 
     function completeOrderProvider(address _orderId) public onlyPrinter {
@@ -188,7 +223,8 @@ contract Formicarium {
         require(orders[_orderId].startTime != 0, "Order not started");
         require(!orders[_orderId].isCompletedProvider, "Order already completed");
         require(block.timestamp < orders[_orderId].startTime + orders[_orderId].duration, "Order duration expired");
-        orders[_orderId].isCompletedProvider = true;        
+        orders[_orderId].isCompletedProvider = true;   
+        emit OrderCompleted(_orderId, msg.sender);     
     }
 
     function reportUncompleteOrder(address _orderId) public {

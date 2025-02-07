@@ -4,24 +4,24 @@ const hre = require("hardhat");
 async function main() {
     const formicariumAddress = process.env.FORMICARIUM_TEST_ADDRESS;
     const erc20Address = process.env.ERC_ADDRESS;
-    const deployerPrivateKey = process.env.PRIVATE_KEY;
-    const customerAddress = process.env.ADDRESS;
+    const customerPrivateKey = process.env.PRIVATE_KEY2;
+    const customerAddress = process.env.ADDRESS2;
 
-    if (!formicariumAddress || !erc20Address || !deployerPrivateKey || !customerAddress) {
-        throw new Error("Missing environment variables! Ensure FORMICARIUM_ADDRESS, EXISTING_ERC20_ADDRESS, DEPLOYER_PRIVATE_KEY, and CUSTOMER_ADDRESS are set in .env file");
+    if (!formicariumAddress || !erc20Address || !customerPrivateKey || !customerAddress) {
+        throw new Error("Missing environment variables! Ensure FORMICARIUM_ADDRESS, EXISTING_ERC20_ADDRESS, CUSTOMER_PRIVATE_KEY, and CUSTOMER_ADDRESS are set in .env file");
     }
 
-    // Connect to the blockchain using the deployer's private key
+    // Connect to the blockchain using the customer's private key
     const provider = hre.ethers.provider;
-    const deployer = new hre.ethers.Wallet(deployerPrivateKey, provider);
+    const customer = new hre.ethers.Wallet(customerPrivateKey, provider);
 
-    console.log(`Using deployer account: ${deployer.address}`);
+    console.log(`Using customer account: ${customer.address}`);
 
     // Load the Formicarium contract
-    const formicarium = await hre.ethers.getContractAt("Formicarium", formicariumAddress, deployer);
+    const formicarium = await hre.ethers.getContractAt("Formicarium", formicariumAddress, customer);
 
     // Load ERC20 token contract
-    const paymentToken = await hre.ethers.getContractAt("IERC20", erc20Address, deployer);
+    const paymentToken = await hre.ethers.getContractAt("IERC20", erc20Address, customer);
 
     // Fetch all printers from `getAllPrinters()`
     console.log("🔄 Fetching registered printers...");
@@ -39,23 +39,27 @@ async function main() {
     const balance = await paymentToken.balanceOf(customerAddress);
     console.log(`💰 Customer Balance: ${hre.ethers.formatEther(balance)} MTK`);
 
-    const N_orders = 5; // Number of orders per printer
+    const N_orders = 3; // Number of orders per printer
 
     // Calculate the total amount needed for approval
+    // Calculate the total amount needed for approval
     let totalAmountNeeded = hre.ethers.parseEther("0");
+
     for (let i = 0; i < printers.length; i++) {
         for (let j = 0; j < N_orders; j++) {
-            const minimalPrice = 10; // 5-10 MTK
-            const actualPrice = 2; // + 0-2 MTK
-            totalAmountNeeded += actualPrice;
+            const minimalPrice = hre.ethers.parseEther("10"); // Convert to BigInt
+            const actualPrice = minimalPrice + hre.ethers.parseEther("2"); // Convert to BigInt
+            totalAmountNeeded = totalAmountNeeded + actualPrice; // Ensure same type
         }
     }
+
+    console.log(`🔍 Total allowance needed: ${hre.ethers.formatEther(totalAmountNeeded)}`);
 
     // Check current allowance
     const currentAllowance = await paymentToken.allowance(customerAddress, formicariumAddress);
     if (currentAllowance < totalAmountNeeded) {
         console.log(`⚠️ Approving ${hre.ethers.formatEther(totalAmountNeeded)} MTK for order payments...`);
-        const approveTx = await paymentToken.connect(deployer).approve(formicariumAddress, totalAmountNeeded);
+        const approveTx = await paymentToken.connect(customer).approve(formicariumAddress, totalAmountNeeded);
         await approveTx.wait();
     } else {
         console.log("✅ Sufficient allowance already set.");
@@ -79,7 +83,7 @@ async function main() {
             console.log(`⏳ Duration: ${duration} seconds`);
 
             // Create the order
-            const tx = await formicarium.connect(deployer).createOrder(orderId, printerId, minimalPrice, actualPrice, duration);
+            const tx = await formicarium.connect(customer).createOrder(orderId, printerId, minimalPrice, actualPrice, duration);
             await tx.wait();
             console.log(`✅ Order ${orderId} created successfully!`);
         }

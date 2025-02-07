@@ -167,4 +167,50 @@ describe("Advanced Formicarium Tests", function () {
     const order = await formicarium.orders(orderId);
     expect(order.ID).to.equal(hre.ethers.ZeroAddress);
   });
+
+  it("Should emit OrderCreated event", async function () {
+    await formicarium.connect(printer).registerPrinter("Printer 1");
+    const orderId = hre.ethers.Wallet.createRandom().address;
+    const orderPrice = hre.ethers.parseEther("10");
+    await paymentToken.connect(customer).approve(formicarium.target, orderPrice);
+    await expect(formicarium.connect(customer).createOrder(orderId, printer.address, orderPrice, orderPrice, 3600))
+      .to.emit(formicarium, "OrderCreated")
+      .withArgs(orderId, printer.address, orderPrice, orderPrice, 3600);
+  });
+
+  it("Should emit OrderSigned event", async function () {
+    await formicarium.connect(printer).registerPrinter("Printer 1");
+    const orderId = hre.ethers.Wallet.createRandom().address;
+    const orderPrice = hre.ethers.parseEther("10");
+    await paymentToken.connect(customer).approve(formicarium.target, orderPrice);
+    await formicarium.connect(customer).createOrder(orderId, printer.address, orderPrice, orderPrice, 3600);
+    await expect(formicarium.connect(printer).signOrder(orderId))
+      .to.emit(formicarium, "OrderSigned")
+      .withArgs(orderId, printer.address);
+  });
+
+  it("Should emit OrderStarted event", async function () {
+    await formicarium.connect(printer).registerPrinter("Printer 1");
+    const orderId = hre.ethers.Wallet.createRandom().address;
+    const orderPrice = hre.ethers.parseEther("10");
+    await paymentToken.connect(customer).approve(formicarium.target, orderPrice);
+    await formicarium.connect(customer).createOrder(orderId, printer.address, orderPrice, orderPrice, 3600);
+    await formicarium.connect(printer).signOrder(orderId);
+    await expect(formicarium.connect(printer).executeNewOrder())
+      .to.emit(formicarium, "OrderStarted")
+      .withArgs(orderId, printer.address);
+  });
+
+  it("Should emit OrderCompleted event", async function () {
+    await formicarium.connect(printer).registerPrinter("Printer 1");
+    const orderId = hre.ethers.Wallet.createRandom().address;
+    const orderPrice = hre.ethers.parseEther("10");
+    await paymentToken.connect(customer).approve(formicarium.target, orderPrice);
+    await formicarium.connect(customer).createOrder(orderId, printer.address, orderPrice, orderPrice, 3600);
+    await formicarium.connect(printer).signOrder(orderId);
+    await formicarium.connect(printer).executeNewOrder();
+    await expect(formicarium.connect(printer).completeOrderProvider(orderId))
+      .to.emit(formicarium, "OrderCompleted")
+      .withArgs(orderId, printer.address);
+  });
 });
