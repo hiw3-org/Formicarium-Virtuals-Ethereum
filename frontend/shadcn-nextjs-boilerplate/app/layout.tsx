@@ -3,6 +3,7 @@ import { PropsWithChildren } from 'react';
 import '@/styles/globals.css';
 import { ThemeProvider } from './theme-provider';
 import { Anybody } from 'next/font/google';
+import Navbar from "@/components/navbar/Navbar";
 
 export const dynamic = 'force-dynamic';
 const anybody = Anybody({ subsets: ['latin'], weight: ['400', '700'] });
@@ -75,7 +76,13 @@ export default function RootLayout({
       <body id={'root'} className={`${anybody.className} loading bg-white`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <SupabaseProvider>
-            <main id="skip">{children}</main>
+            <Navbar brandText="formicarium"/>
+            {/* Background applied to all pages */}
+            <div className="w-screen min-h-screen bg-repeat bg-top pt-16"
+                 style={{backgroundImage: "url('/background.png')", backgroundSize: "auto"}}>
+
+              <main className="container mx-auto px-6 py-10">{children}</main>
+            </div>
           </SupabaseProvider>
         </ThemeProvider>
       </body>
