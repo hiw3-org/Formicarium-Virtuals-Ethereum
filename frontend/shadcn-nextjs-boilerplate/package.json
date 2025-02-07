@@ -81,6 +81,7 @@
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.5.2",
     "endent": "^2.1.0",
+    "ethers": "^6.13.5",
     "eventsource-parser": "^1.1.2",
     "framer-motion": "^11.2.6",
     "input-otp": "^1.4.2",
