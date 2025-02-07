@@ -78,10 +78,14 @@ export default function RootLayout({
           <SupabaseProvider>
             <Navbar brandText="formicarium"/>
             {/* Background applied to all pages */}
-            <div className="w-screen min-h-screen bg-repeat bg-top pt-16"
+            <div className="relative w-screen min-h-screen bg-repeat bg-top pt-16"
                  style={{backgroundImage: "url('/background.png')", backgroundSize: "auto"}}>
 
-              <main className="container mx-auto px-6 py-10">{children}</main>
+              {/* Dark Overlay */}
+              <div className="absolute inset-0 bg-black opacity-60"></div>
+
+              {/* Content needs to be relative to stay above overlay */}
+              <main className="relative container mx-auto px-6 py-10">{children}</main>
             </div>
           </SupabaseProvider>
         </ThemeProvider>

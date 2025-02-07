@@ -2,12 +2,23 @@
 import Chat from "@/components/chat/chat";
 import OrderSummary from "@/components/card/OrderSummary";
 import ApproveCard from "@/components/card/Approve";
+import {Syncopate} from "next/font/google";
+
+const syncopate = Syncopate({ weight: "700", subsets: ["latin"] });
 
 export default function ChatPage() {
     return (
         <div className="grid grid-cols-2 gap-8">
             {/* Left Column (Chat) */}
             <div className="bg-transparent md:col-span-1 p-0 rounded-lg shadow-md">
+                <div className="flex flex-col w-full">
+                    {/* Order Summary Title */}
+                    <div
+                        className={`${syncopate.className} text-[#eab71a] text-[48px] text-center font-bold flex items-center`}>formicarium
+                    </div>
+                    <div className="text-[22px] text-[#2AB0CA]">Next-Gen Manufacturing</div>
+                    <div className="text-[20px] text-[#F0F0F0]">Shared Machines, Infinite Possibilities.</div>
+                </div>
                 <Chat responses={[
                     "Hello! How can I help you today?",
                     "I'm just a simulated AI, but I can respond with predefined messages.",
