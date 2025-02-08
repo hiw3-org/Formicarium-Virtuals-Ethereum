@@ -161,7 +161,7 @@ describe("Advanced Formicarium Tests", function () {
     await hre.network.provider.send("evm_mine");
 
     // Transfer funds to provider
-    await formicarium.connect(printer).transferFundsProivder(orderId);
+    await formicarium.connect(printer).transferFundsProvider(orderId);
 
     // Verify order has been deleted
     const order = await formicarium.orders(orderId);
@@ -212,5 +212,88 @@ describe("Advanced Formicarium Tests", function () {
     await expect(formicarium.connect(printer).completeOrderProvider(orderId))
       .to.emit(formicarium, "OrderCompleted")
       .withArgs(orderId, printer.address);
+  });
+
+  it("Should return all orders placed by the customer", async function () {
+    // Register printer
+    await formicarium.connect(printer).registerPrinter("Printer 1");
+  
+    // Approve tokens for customer
+    const orderPrice = hre.ethers.parseEther("10");
+    await paymentToken.connect(customer).approve(formicarium.target, orderPrice + orderPrice);
+  
+    // Create two orders for the same customer
+    const orderId1 = hre.ethers.Wallet.createRandom().address;
+    const orderId2 = hre.ethers.Wallet.createRandom().address;
+  
+    await formicarium.connect(customer).createOrder(orderId1, printer.address, orderPrice, orderPrice, 3600);
+    await formicarium.connect(customer).createOrder(orderId2, printer.address, orderPrice, orderPrice, 3600);
+  
+    // Retrieve customer orders
+    const customerOrders = await formicarium.connect(customer).getYourOrders();
+  
+    // Validate that two orders were retrieved
+    expect(customerOrders.length).to.equal(2);
+    expect(customerOrders[0].ID).to.equal(orderId1);
+    expect(customerOrders[1].ID).to.equal(orderId2);
+  });
+  
+  it("Should return an empty array when the customer has no orders", async function () {
+    // Attempt to retrieve orders for a customer with no orders
+    const customerOrders = await formicarium.connect(customer).getYourOrders();
+  
+    // Validate that no orders are returned
+    expect(customerOrders.length).to.equal(0);
+  });
+  
+  it("Should not return orders placed by other customers", async function () {
+    // Register printer
+    await formicarium.connect(printer).registerPrinter("Printer 1");
+  
+    // Approve tokens
+    const orderPrice = hre.ethers.parseEther("10");
+    await paymentToken.connect(customer).approve(formicarium.target, orderPrice);
+    await paymentToken.connect(customer2).approve(formicarium.target, orderPrice);
+  
+    // Create one order for each customer
+    const orderIdCustomer1 = hre.ethers.Wallet.createRandom().address;
+    const orderIdCustomer2 = hre.ethers.Wallet.createRandom().address;
+  
+    await formicarium.connect(customer).createOrder(orderIdCustomer1, printer.address, orderPrice, orderPrice, 3600);
+    await formicarium.connect(customer2).createOrder(orderIdCustomer2, printer.address, orderPrice, orderPrice, 3600);
+  
+    // Retrieve orders for customer1
+    const customerOrders1 = await formicarium.connect(customer).getYourOrders();
+    expect(customerOrders1.length).to.equal(1);
+    expect(customerOrders1[0].ID).to.equal(orderIdCustomer1);
+  
+    // Retrieve orders for customer2
+    const customerOrders2 = await formicarium.connect(customer2).getYourOrders();
+    expect(customerOrders2.length).to.equal(1);
+    expect(customerOrders2[0].ID).to.equal(orderIdCustomer2);
+  });
+  
+  it("Should return orders only if they exist in the provider order list", async function () {
+    // Register printer
+    await formicarium.connect(printer).registerPrinter("Printer 1");
+  
+    // Approve tokens
+    const orderPrice = hre.ethers.parseEther("10");
+    await paymentToken.connect(customer).approve(formicarium.target, orderPrice + orderPrice);
+  
+    // Create an order
+    const orderId1 = hre.ethers.Wallet.createRandom().address;
+    await formicarium.connect(customer).createOrder(orderId1, printer.address, orderPrice, orderPrice, 3600);
+
+    // Wait more than 5 minutes
+    await hre.network.provider.send("evm_increaseTime", [3600 + 360]); // +5 minutes buffer 
+
+    // Create another order
+    const orderId2 = hre.ethers.Wallet.createRandom().address;
+    await formicarium.connect(customer).createOrder(orderId2, printer.address, orderPrice, orderPrice, 3600);
+  
+    // Retrieve orders, should return empty due to incorrect providerOrders
+    const customerOrders = await formicarium.connect(customer).getYourOrders();
+    expect(customerOrders.length).to.equal(1);
   });
 });
