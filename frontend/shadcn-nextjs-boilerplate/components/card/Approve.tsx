@@ -5,17 +5,17 @@ import { Button } from "@/components/ui/button";
 import { FaCheck } from "react-icons/fa6";
 import { HiArrowPath } from "react-icons/hi2";
 
-interface ImageApprovalProps {
-    onApprove: () => void;
-    onReject: () => void;
-    text: string;
-}
+// interface ImageApprovalProps {
+//     onApprove: () => void;
+//     onReject: () => void;
+//     text: string;
+// }
 
 import { useGlobalContext } from "@/contexts/GlobalContext";
 import {useEffect, useState} from "react";
 
 
-export default function ApproveCard({onApprove, onReject }: ImageApprovalProps) {
+export default function ApproveCard() {
     const { image2Dmodel } = useGlobalContext();
     const defaultImage = "/approve2DBackground.png";
     const [imageSrc, setImageSrc] = useState<string>(defaultImage);
@@ -46,24 +46,24 @@ export default function ApproveCard({onApprove, onReject }: ImageApprovalProps) 
                     />
             </div>
 
-            {/* Button Column (Right Side) */}
-            <div className="flex flex-col  items-center ml-4">
-                {/* Yes Button (Above) */}
-                <Button
-                    onClick={onApprove}
-                    className="bg-[#eab71a] text-white font-bold py-2 px-6 rounded-sm shadow-md hover:bg-yellow-600 transition mb-4 flex items-center justify-center"
-                >
-                    <FaCheck className="w-6 h-6 text-[#0F172A]" />
-                </Button>
+            {/*/!* Button Column (Right Side) *!/*/}
+            {/*<div className="flex flex-col  items-center ml-4">*/}
+            {/*    /!* Yes Button (Above) *!/*/}
+            {/*    <Button*/}
+            {/*        onClick={onApprove}*/}
+            {/*        className="bg-[#eab71a] text-white font-bold py-2 px-6 rounded-sm shadow-md hover:bg-yellow-600 transition mb-4 flex items-center justify-center"*/}
+            {/*    >*/}
+            {/*        <FaCheck className="w-6 h-6 text-[#0F172A]" />*/}
+            {/*    </Button>*/}
 
-                {/* No Button (Below) */}
-                <Button
-                    onClick={onReject}
-                    className="bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-sm shadow-md hover:bg-gray-400 transition border border-[#EAB71A]"
-                >
-                    <HiArrowPath className="w-6 h-6 text-[#0F172A]" />
-                </Button>
-            </div>
+            {/*    /!* No Button (Below) *!/*/}
+            {/*    <Button*/}
+            {/*        onClick={onReject}*/}
+            {/*        className="bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-sm shadow-md hover:bg-gray-400 transition border border-[#EAB71A]"*/}
+            {/*    >*/}
+            {/*        <HiArrowPath className="w-6 h-6 text-[#0F172A]" />*/}
+            {/*    </Button>*/}
+            {/*</div>*/}
         </div>
     );
 }

@@ -32,27 +32,16 @@ export default function ChatPage() {
             <div className="text-[22px] text-[#2AB0CA]">
               Next-Gen Manufacturing
             </div>
-            <div className="text-[20px] text-[#F0F0F0]}">
+            <div className="text-[20px] text-[#F0F0F0]} text-white">
               Shared Machines, Infinite Possibilities.
             </div>
           </div>
-          <Chat
-            responses={[
-              'Hello! How can I help you today?',
-              "I'm just a simulated AI, but I can respond with predefined messages.",
-              "Tell me more about what you're working on!",
-              'That sounds interesting! Could you elaborate?'
-            ]}
-          />
+          <Chat/>
         </div>
 
         {/* Right Column (Approval & Order Summary) */}
         <div className="md:col-span-1 w-6/7 max-w-lg min-w-[400px] flex flex-col space-y-4">
-          <ApproveCard
-            onApprove={() => approve2Dmodel()}
-            onReject={() => alert('Rejected')}
-            text="Use chat to generate an image?"
-          />
+          <ApproveCard/>
           <ApproveCardSTL
             onApprove={() => alert('Approved')}
             onReject={() => alert('Rejected')}

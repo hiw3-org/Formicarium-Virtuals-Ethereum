@@ -15,7 +15,7 @@ interface ImageApprovalProps {
 import { useGlobalContext } from "@/contexts/GlobalContext";
 
 export default function ApproveCardSTL({ onApprove, onReject }: ImageApprovalProps) {
-    const { imageSTLmodel , stlModel,setSTLModel} = useGlobalContext();
+    const { imageSTLmodel } = useGlobalContext();
     const defaultImage = "/approveSTLBackground.png";
     const [imageSrc, setImageSrc] = useState<string>(defaultImage);
 
@@ -26,10 +26,6 @@ export default function ApproveCardSTL({ onApprove, onReject }: ImageApprovalPro
             setImageSrc(defaultImage); // Ensure default image is always set
         }
     }, [imageSTLmodel]);
-
-    useEffect(() => {
-        console.log("STL Model: ", stlModel);
-    }, [stlModel]);
 
 
     return (
@@ -45,24 +41,24 @@ export default function ApproveCardSTL({ onApprove, onReject }: ImageApprovalPro
                     />
             </div>
 
-            {/* Button Column (Right Side) */}
-            <div className="flex flex-col  items-center ml-4">
-                {/* Yes Button (Above) */}
-                <Button
-                    onClick={onApprove}
-                    className="bg-[#eab71a] text-white font-bold py-2 px-6 rounded-sm shadow-md hover:bg-yellow-600 transition mb-4 flex items-center justify-center"
-                >
-                    <FaCheck className="w-6 h-6 text-[#0F172A]" />
-                </Button>
+            {/*/!* Button Column (Right Side) *!/*/}
+            {/*<div className="flex flex-col  items-center ml-4">*/}
+            {/*    /!* Yes Button (Above) *!/*/}
+            {/*    <Button*/}
+            {/*        onClick={onApprove}*/}
+            {/*        className="bg-[#eab71a] text-white font-bold py-2 px-6 rounded-sm shadow-md hover:bg-yellow-600 transition mb-4 flex items-center justify-center"*/}
+            {/*    >*/}
+            {/*        <FaCheck className="w-6 h-6 text-[#0F172A]" />*/}
+            {/*    </Button>*/}
 
-                {/* No Button (Below) */}
-                <Button
-                    onClick={onReject}
-                    className="bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-sm shadow-md hover:bg-gray-400 transition border border-[#EAB71A]"
-                >
-                    <HiArrowPath className="w-6 h-6 text-[#0F172A]" />
-                </Button>
-            </div>
+            {/*    /!* No Button (Below) *!/*/}
+            {/*    <Button*/}
+            {/*        onClick={onReject}*/}
+            {/*        className="bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-sm shadow-md hover:bg-gray-400 transition border border-[#EAB71A]"*/}
+            {/*    >*/}
+            {/*        <HiArrowPath className="w-6 h-6 text-[#0F172A]" />*/}
+            {/*    </Button>*/}
+            {/*</div>*/}
         </div>
     );
 }
