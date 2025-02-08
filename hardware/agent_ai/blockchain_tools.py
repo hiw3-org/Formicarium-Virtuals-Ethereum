@@ -27,31 +27,48 @@ web3 = Web3(Web3.HTTPProvider(RPC_URL))
 contract_address = os.getenv("FORMICARIUM_TEST_ADDRESS")
 printer_address = os.getenv("ADDRESS")
 private_key = os.getenv("PRIVATE_KEY")
+address_2 = os.getenv("ADDRESS2")
+private_key_2 = os.getenv("PRIVATE_KEY2")
 contract = web3.eth.contract(address=contract_address, abi=abi)
 
 @tool("sign_order", return_direct=True)
 def sign_order(order_id):
-    """SIgn an order with the provided ID.
+    """Sign an order with the provided ID.
 
     Args:
-        order_id (_type_): _description_
+        order_id (str): Order ID (Ethereum address) to be signed.
     """
+    checksum_order_id = web3.to_checksum_address(order_id)
+    
     try:
+        # Get the nonce for the printer address
         nonce = web3.eth.get_transaction_count(printer_address)
-        tx = contract.functions.signOrder(order_id).build_transaction({
+
+        # Build the transaction
+        tx = contract.functions.signOrder(checksum_order_id).build_transaction({
             'from': printer_address,
             'gas': 200000,
             'gasPrice': web3.eth.gas_price,
             'nonce': nonce
         })
 
+        # Sign the transaction using the private key
         signed_tx = web3.eth.account.sign_transaction(tx, private_key)
-        tx_hash = web3.eth.send_raw_transaction(signed_tx.rawTransaction)
 
-        print(f"Order {order_id} signed! Transaction hash: {web3.to_hex(tx_hash)}")
+        # Log the signed transaction to inspect its attributes
+        print(f"Signed transaction: {signed_tx}")
+
+        # Send the raw transaction (convert to hex if necessary)
+        tx_hash = web3.eth.send_raw_transaction(signed_tx.raw_transaction)
+
+        # Print the transaction hash
+        print(f"Order {checksum_order_id} signed! Transaction hash: {web3.to_hex(tx_hash)}")
+
+        return web3.to_hex(tx_hash)  # Return the transaction hash for confirmation
 
     except Exception as e:
-        print(f"Error signing order {order_id}: {e}")
+        print(f"Error signing order {checksum_order_id}: {e}")
+        return f"Error signing order: {e}"
 
 # Function to execute a new order
 @tool("execute_new_order", return_direct=True)
@@ -68,7 +85,7 @@ def execute_new_order():
         })
 
         signed_tx = web3.eth.account.sign_transaction(tx, private_key)
-        tx_hash = web3.eth.send_raw_transaction(signed_tx.rawTransaction)
+        tx_hash = web3.eth.send_raw_transaction(signed_tx.raw_transaction)
 
         print(f"🚀 New order executed! Transaction hash: {web3.to_hex(tx_hash)}")
 
@@ -83,9 +100,10 @@ def complete_order_provider(order_id):
     Args:
         order_id (_type_): _description_
     """
+    checksum_order_id = web3.to_checksum_address(order_id)
     try:
         nonce = web3.eth.get_transaction_count(printer_address)
-        tx = contract.functions.completeOrderProvider(order_id).build_transaction({
+        tx = contract.functions.completeOrderProvider(checksum_order_id).build_transaction({
             'from': printer_address,
             'gas': 200000,
             'gasPrice': web3.eth.gas_price,
@@ -93,12 +111,12 @@ def complete_order_provider(order_id):
         })
 
         signed_tx = web3.eth.account.sign_transaction(tx, private_key)
-        tx_hash = web3.eth.send_raw_transaction(signed_tx.rawTransaction)
+        tx_hash = web3.eth.send_raw_transaction(signed_tx.raw_transaction)
 
-        print(f"✅ Order {order_id} completed! Transaction hash: {web3.to_hex(tx_hash)}")
+        print(f"✅ Order {checksum_order_id} completed! Transaction hash: {web3.to_hex(tx_hash)}")
 
     except Exception as e:
-        print(f"❌ Error completing order {order_id}: {e}")
+        print(f"❌ Error completing order {checksum_order_id}: {e}")
 
 # Function to transfer funds to the provider
 @tool("transfer_funds_provider", return_direct=True)
@@ -126,32 +144,28 @@ def transfer_funds_provider(order_id):
         print(f"❌ Error transferring funds for order {order_id}: {e}")
         
         
-@tool("get_provider_orders", return_direct=True)
-def get_provider_orders():
-    """Retrieve the list of orders for a given provider address from the providerOrders mapping.
-
-    Args:
-        provider_address (str): The address of the provider to check orders for.
-
-    Returns:
-        List of orders associated with the given provider address.
-    """
+@tool("get_active_orders")
+def get_active_orders():
+    """Retrieve the list of active orders for the current provider address."""
     try:
-        # Call the providerOrders mapping to get the list of orders for the given provider address
-        provider_orders = contract.functions.providerOrders(os.getenv("ADDRESS")).call()
-
-        if provider_orders:
-            return provider_orders
+        # Call the getActiveOrders function in the contract
+        active_orders = contract.functions.getActiveOrders().call({
+            'from': printer_address  # Set the msg.sender in Solidity
+        })
+        
+        # Process and return the orders
+        if active_orders:
+            return active_orders
         else:
             return []
-
+    
     except Exception as e:
-        print(f"Error fetching orders for provider {os.getenv("ADDRESS")}: {e}")
+        print(f"Error fetching active orders for provider {printer_address}: {e}")
         return []
 
 # Event Handler
 async def handle_event(event):
-    if event['event'] == "OrderCreated":
+    if event.event == "OrderCreated":
         # SPROŽIMO POSTOPEK PODPISA NAROČILA
             # - Prvo pogledamo ali parametri naročila ustrezajo (enako kot pri API klicu)
             # - Podpišemo na SC
@@ -163,10 +177,8 @@ async def handle_event(event):
                 print(f"Error processing chat request: {response.text}")
                 return
             
-    
-    elif event['event'] == "OrderStarted":
+    if event.event == "OrderStarted":
         if event['args']['printerId'] == printer_address:
-            print(f"Arguments: {event['args']}")
             prompt = f"[Event trigger], OrderStarted: {event['args']}"
             async with httpx.AsyncClient() as client:
                 response = await client.post("http://localhost:8080/api/create_order_request", json={"prompt": prompt})
@@ -179,6 +191,47 @@ async def handle_event(event):
             # - Poženemo tiskanje
 
 
+# async def listen_events():
+#     print("Listening for events...")
+
+#     latest_block = web3.eth.get_block('latest')["number"]
+
+#     while True:
+#         try:
+
+#             # Get new logs from the latest block
+#             new_logs = web3.eth.get_logs({
+#                 "fromBlock": latest_block,
+#                 "address": contract_address
+#             })
+
+#             # Check if new_logs is None
+#             if new_logs is None:
+#                 print("No logs returned")
+#                 continue  # Skip this iteration
+
+#             # Process the logs
+#             for log in new_logs:
+#                 # Check the event signature by matching the topic
+#                 # First, try to decode for OrderCreated
+               
+#                 if log["topics"][0].hex() == web3.keccak(text="OrderCreated(address,address,uint256,uint256,uint256)").hex():
+#                     event_data = contract.events.OrderCreated().process_log(log)
+#                     await handle_event(event_data)
+
+#                 # Next, check for OrderStarted
+#                 elif log["topics"][0].hex() == web3.keccak(text="OrderStarted(address,address)").hex():
+#                     event_data = contract.events.OrderStarted().process_log(log)
+#                     await handle_event(event_data)
+
+#             latest_block = web3.eth.get_block('latest')["number"] + 1  # Move to the next block
+
+#         except Exception as e:
+#             print(f"Error fetching events: {e}")
+
+#         await asyncio.sleep(1)  # Avoid excessive polling
+        
+        
 async def listen_events():
     print("Listening for events...")
 
@@ -199,9 +252,14 @@ async def listen_events():
                 continue  # Skip this iteration
 
             # Process the logs
-            for log in new_logs:
-                event_data = contract.events.OrderCreated().process_log(log)
-                await handle_event(event_data)
+            for log in new_logs:               
+                # event_data = contract.events.OrderCreated().process_log(log)
+                prompt = f"[Event trigger], blockchain: {log}"
+                async with httpx.AsyncClient() as client:
+                    response = await client.post("http://localhost:8080/api/create_order_request", json={"prompt": prompt})
+                if response.status_code != 200:
+                    print(f"Error processing chat request: {response.text}")
+                    return
 
             latest_block = web3.eth.get_block('latest')["number"] + 1  # Move to the next block
 

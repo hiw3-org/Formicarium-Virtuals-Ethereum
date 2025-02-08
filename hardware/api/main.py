@@ -1,14 +1,21 @@
 from fastapi import FastAPI
-from routes import router as api_router
+
 from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 from contextlib import asynccontextmanager
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+from hardware.api.routes import router as api_router
+
 from hardware.agent_ai.blockchain_tools import listen_events
 from hardware.agent_ai.octoprint_tools import poll_octoprint_status  # Import the polling function
 
 # Initialize global variable for previous state
 previous_state = None
 
+print("Starting server...")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

@@ -13,7 +13,7 @@ router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 
 # OctoPrint Camera Stream URL
-octoprint_camera_url = "http://192.168.221.144/webcam/?action=stream"
+octoprint_camera_url = "http://192.168.0.220/webcam/?action=stream"
 # octoprint_camera_url = "http://97.68.104.34/mjpg/video.mjpg" TEST URL
 
 

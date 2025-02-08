@@ -156,6 +156,9 @@ def calculate_3d_printing_cost(gcode_file, PRINTER_SETTINGS=PRINTER_SETTINGS, MA
         total_cost:  _description_
         print_time_hours: _description_
     """
+    # Change to all lowercase
+    gcode_file = gcode_file.lower()
+    
     # Determine the relative path to the G-code file
     base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../agents/keychain_design"))
     gcode_file_path = os.path.join(base_path, gcode_file)

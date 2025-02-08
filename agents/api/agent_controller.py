@@ -9,6 +9,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from agents.agent_ai.agent import chat_with_agent, get_or_create_agent, cleanup_inactive_agents
+from agents.agent_ai.keychain_design_tools import convert_stl_to_image
 
 # Request model for the chat endpoint
 class ChatRequest(BaseModel):
@@ -62,23 +63,36 @@ def process_chat_request(request: ChatRequest, background_tasks: BackgroundTasks
 
         for file_path in file_paths:
             if os.path.exists(file_path):
+                
                 with open(file_path, "rb") as file:
-                    file_data = file.read()
-                    encoded_content = base64.b64encode(file_data).decode("utf-8")
-                    file_name = os.path.basename(file_path)
+                    
+                    if file_path.endswith(".stl"):
+                        # Convert the STL file to an image
+                        output_path = convert_stl_to_image(file_path)
+                        
+                        with open(output_path, "rb") as file:
+                        
+                            file_data = file.read()
+                            encoded_content = base64.b64encode(file_data).decode("utf-8")
+                            file_name = os.path.basename(output_path)
 
-                    if file_name.endswith(".stl"):
-                        stl_file = FileData(
-                            filename=file_name,
-                            content=encoded_content,
-                            content_type="application/octet-stream"
-                        )
-                    elif file_name.endswith(".png"):
+                            stl_file = FileData(
+                                filename=file_name,
+                                content=encoded_content,
+                                content_type="image/png"
+                            )
+
+                    elif file_path.endswith(".png"):
+                        file_data = file.read()
+                        encoded_content = base64.b64encode(file_data).decode("utf-8")
+                        file_name = os.path.basename(file_path)
+
                         image_file = FileData(
                             filename=file_name,
                             content=encoded_content,
                             content_type="image/png"
                         )
+
                         
         background_tasks.add_task(cleanup_inactive_agents)
 

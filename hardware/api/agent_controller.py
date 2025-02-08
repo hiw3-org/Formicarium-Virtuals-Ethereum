@@ -1,6 +1,4 @@
 from pydantic import BaseModel
-from typing import Optional
-from fastapi import HTTPException, Request, BackgroundTasks
 import os
 import re
 import base64

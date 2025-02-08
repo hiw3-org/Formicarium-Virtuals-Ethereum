@@ -10,6 +10,10 @@ import hashlib
 import os
 import sys
 import subprocess
+from PIL import Image, ImageEnhance
+from trimesh.scene import Scene
+import io
+import secrets
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
@@ -20,6 +24,17 @@ output_folder = Path("agents/keychain_design")
 def shorten_filename(prompt: str) -> str:
     hash_digest = hashlib.md5(prompt.encode()).hexdigest()[:8]  # Get the first 8 characters of the hash
     return f"{hash_digest}.png"
+
+def generate_random_id(prompt: str) -> str:
+    # Use the prompt to seed the randomness (or you can ignore the prompt if you want totally random)
+    random_seed = secrets.token_hex(20)  # Generates 40 characters of hex (20 bytes)
+    
+    # This generates a random "Ethereum-like" address, 40 characters (hex) with '0x' prefix
+    eth_address = '0x' + random_seed[:40].lower()
+    
+    shortened_address = eth_address[2:]  # Skip '0x' prefix 
+
+    return f"{shortened_address}.png"
 
 
 def image_to_stl(
@@ -154,7 +169,7 @@ def generate_image_tool(prompt: str) -> str:
 
     # Sanitize the prompt to create a valid filename
     sanitized_prompt = "".join(c for c in prompt if c.isalnum() or c in (" ", "_")).rstrip()
-    image_path = output_folder / shorten_filename(sanitized_prompt)
+    image_path = output_folder / generate_random_id(sanitized_prompt)
 
     with open(image_path, "wb") as f:
         f.write(response.content)
@@ -200,20 +215,67 @@ def get_offer_from_printer_agent(gcode_path: str) -> str:
         return response.json().get("response", "No response content found.")
     else:
         return f"Error: {response.status_code}, {response.text}"
+    
+    
+def convert_stl_to_image(stl_path, rotation=(0, -60, -90), contrast_factor=1.8, brightness_factor=1.1):
+    try:
+        stl_path = output_folder / f"{Path(stl_path).stem}.stl"
+        stl_path.parent.mkdir(exist_ok=True)
+        # Load the STL mesh
+        mesh = tm.load_mesh(stl_path)
+
+        # Ensure all faces have the same color (for better contrast)
+        if hasattr(mesh.visual, "vertex_colors"):
+            mesh.visual.vertex_colors = [200, 200, 200, 255]  # Light gray color
+
+        # Center the model before rotating
+        mesh.apply_translation(-mesh.centroid)
+
+        # Apply rotation (convert degrees to radians)
+        rx, ry, rz = np.radians(rotation)
+        rotation_matrix = tm.transformations.euler_matrix(rx, ry, rz)
+
+        # Transform the mesh
+        mesh.apply_transform(rotation_matrix)
+
+        # Create a scene for rendering
+        scene = Scene([mesh])
+
+        # Adjust camera to ensure full model visibility
+        bounding_box = mesh.bounding_box.extents
+        camera_distance = max(bounding_box)  # Move camera further
+        scene.camera_transform = tm.transformations.translation_matrix([0, 0, camera_distance])
+
+        # Debug: Show the scene before rendering
+        # scene.show()  # Uncomment to preview before saving
+
+        # Render the scene to an image buffer
+        image_bytes = scene.save_image(resolution=[640, 480])
+        if image_bytes is None:
+            raise ValueError("Failed to render image from STL.")
+
+        # Convert bytes to a PIL Image
+        image = Image.open(io.BytesIO(image_bytes))
+
+        # Apply brightness and contrast enhancement
+        enhancer = ImageEnhance.Contrast(image)
+        image = enhancer.enhance(contrast_factor)  # Increase contrast
+
+        enhancer = ImageEnhance.Brightness(image)
+        image = enhancer.enhance(brightness_factor)  # Increase brightness
+        
+        output_path = output_folder / f"{Path(stl_path).stem}_stl.png"
+
+        # Save the improved image
+        image.save(output_path)
+        return str(output_path)
+
+    except Exception as e:
+        print(f"Error: {e}")
 
 # main function, call image_to_stl
 if __name__ == "__main__":
-    # # input_image_path = "agents/keychain-design/564ebab1.png"
-    # output_stl_path = "9d15cd21.stl"
-    # stl_path = output_folder / f"{Path(output_stl_path).stem}.stl"
-    # stl_path.parent.mkdir(exist_ok=True)
-    # # image_to_stl(input_image_path, output_stl_path)
-    # output_gcode = slice_stl(stl_path, [50,50,50])
-    # print(output_gcode)
-    # input_img = "agents/keychain_design/9d15cd21.png"
-    output_stl_path = "agents/keychain_design/9d15cd21_test.stl"
-    stl_path = output_folder / f"{Path(output_stl_path).stem}.stl"
-    slice_stl(stl_path, box_size=[100,100,100])
-    # image_to_stl(input_img, output_stl_path)
+    id = generate_random_id("sfsdf")
+    print(id)
     
     

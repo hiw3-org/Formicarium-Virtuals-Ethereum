@@ -19,6 +19,8 @@ trimesh = "^4.6.1"
 pillow = "^11.1.0"
 manifold3d = "^3.0.1"
 web3 = "^7.8.0"
+pyglet = "<2"
+pyrender = "^0.1.45"
 
 [build-system]
 requires = ["poetry-core"]

@@ -39,7 +39,7 @@ async function main() {
     const balance = await paymentToken.balanceOf(customerAddress);
     console.log(`💰 Customer Balance: ${hre.ethers.formatEther(balance)} MTK`);
 
-    const N_orders = 3; // Number of orders per printer
+    const N_orders = 1; // Number of orders per printer
 
     // Calculate the total amount needed for approval
     // Calculate the total amount needed for approval
@@ -72,10 +72,11 @@ async function main() {
             console.log(`📌 Found printer: ${printerId} | Details: ${printer.printerDetails}`);
 
             // Generate unique order ID
-            const orderId = hre.ethers.Wallet.createRandom().address;
+            const orderId = "0x68364e9112045714b1957a53aee4248c22bc7dc7";
             const minimalPrice = hre.ethers.parseEther((Math.random() * 5 + 5).toFixed(2)); // 5-10 MTK
             const actualPrice = minimalPrice + hre.ethers.parseEther((Math.random() * 2).toFixed(2)); // + 0-2 MTK
-            const duration = Math.floor(Math.random() * 86400) + 3600; // 1 hour to 1 day
+            // const duration = Math.floor(Math.random() * 86400) + 3600; // 1 hour to 1 day
+            const duration = 20*60;
 
             console.log(`📌 Creating order ${orderId} for printer ${printerId}`);
             console.log(`🏷️ Minimal Price: ${hre.ethers.formatEther(minimalPrice)} MTK`);
