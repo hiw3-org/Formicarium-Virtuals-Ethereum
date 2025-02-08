@@ -15,6 +15,7 @@ from cdp_langchain.utils import CdpAgentkitWrapper
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from hardware.agent_ai.calculator_tools import estimate_print_time, calculate_3d_printing_cost
+from hardware.agent_ai.octoprint_tools import upload_file_to_octoprint, start_printing
 from hardware.agent_ai.prompts import user_agent_prompt
 from hardware.agent_ai.config import model, wallet_data_file
 
@@ -51,6 +52,8 @@ def get_or_create_agent(user_id):
         cdp_toolkit = CdpToolkit.from_cdp_agentkit_wrapper(agentkit)
         tools = cdp_toolkit.get_tools() + [estimate_print_time, 
                                            calculate_3d_printing_cost,
+                                           upload_file_to_octoprint,
+                                           start_printing
                                            ]
 
         agent_executor = create_react_agent(
@@ -63,8 +66,7 @@ def get_or_create_agent(user_id):
         # Store the agent instance and its config
         user_agents[user_id] = {
             "agent_executor": agent_executor,
-            "config": config,  # Save the config for later use
-            "history": [],  # Initialize the conversation history
+            "config": config,  # Save the config for later use 
         }
 
     user_last_activity[user_id] = time.time()

@@ -18,7 +18,7 @@ print("ABI:", abi)
 print("Contract Address:", config.FORMICARIUM_SC_ADDRESS)
 print("Network ID:", config.NETWORK_ID)
 
-@tool("get_all_printers", return_direct=True)
+@tool("get_all_printers")
 def get_all_printers() -> str:
     """
     Retrieve all registered printers from the smart contract.
@@ -30,7 +30,7 @@ def get_all_printers() -> str:
             "getAllPrinters",
             abi
         )
-        return json.dumps(printers, indent=2)
+        return str(json.dumps(printers, indent=2))
     except Exception as e:
         return f"Failed to fetch printers: {str(e)}"
     

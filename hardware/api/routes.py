@@ -2,6 +2,10 @@ import logging
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 import httpx
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from hardware.api.agent_controller import ChatRequest, ChatResponse, process_chat_request
 
 router = APIRouter()
@@ -51,12 +55,15 @@ async def stream_camera():
     return StreamingResponse(generate_camera_stream(), media_type="multipart/x-mixed-replace; boundary=frame")
 
 
-@router.post("/chat", response_model=ChatResponse)
+@router.post("/create_order_request", response_model=ChatResponse)
 async def chat(request: ChatRequest):
 
     """
     Endpoint for handling chat requests.
     """
+    # Tle not pride file (gcoda)
+    # On sam pol kliče openai api, da dobi price_per_kg in prie elektrike
+    # In pol sam kliče tool za calculate 
     try:
         response = process_chat_request(request)
         return response

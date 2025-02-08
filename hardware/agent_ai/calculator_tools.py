@@ -23,6 +23,33 @@ COST_FACTORS = {
     "labor_cost_per_hour": 10  # Labor cost per hour in USD
 }
 
+@tool("update_price_per_kg", return_direct=True)
+def update_price_per_kg(price_per_kg=25):
+    """Update the price per kg of PLA filament. The update is ignored if the new price deviates by more than 50% from the original price."""
+    original_price = MATERIAL_SETTINGS.get("price_per_kg", 25)  # Default to 25 if not set
+    min_allowed = original_price * 0.5
+    max_allowed = original_price * 1.5
+    
+    if not (min_allowed <= price_per_kg <= max_allowed):
+        return f"Price update ignored. New price ${price_per_kg} deviates by more than 50% from the original price (${original_price})."
+    
+    MATERIAL_SETTINGS["price_per_kg"] = price_per_kg
+    return f"Price per kg updated to ${price_per_kg}"
+
+@tool("update_electricity_cost", return_direct=True)
+def update_electricity_cost(electricity_cost_per_kWh=0.20):
+    """Update the cost of electricity per kWh. The update is ignored if the new cost deviates by more than 50% from the original cost."""
+    original_cost = COST_FACTORS.get("electricity_cost_per_kWh", 0.20)  # Default to 0.20 if not set
+    min_allowed = original_cost * 0.5
+    max_allowed = original_cost * 1.5
+    
+    if not (min_allowed <= electricity_cost_per_kWh <= max_allowed):
+        return f"Electricity cost update ignored. New cost ${electricity_cost_per_kWh} per kWh deviates by more than 50% from the original cost (${original_cost})."
+    
+    COST_FACTORS["electricity_cost_per_kWh"] = electricity_cost_per_kWh
+    return f"Electricity cost updated to ${electricity_cost_per_kWh} per kWh"
+
+
 def extract_filament_length(gcode_file):
     """Extracts total filament length used (in mm) from G-code."""
     total_filament = 0.0
@@ -59,7 +86,6 @@ def extract_filament_length(gcode_file):
 
 # ====================== TIME ============================
 
-@tool("estimate_print_time", return_direct=True)
 def estimate_print_time(gcode_file):
     """Estimates print time in hours based on G-code movement commands."""
     
@@ -118,9 +144,29 @@ def estimate_print_time(gcode_file):
 # ==========================================================
 @tool("calculate_3d_printing_cost", return_direct=True)
 def calculate_3d_printing_cost(gcode_file, PRINTER_SETTINGS=PRINTER_SETTINGS, MATERIAL_SETTINGS=MATERIAL_SETTINGS, COST_FACTORS=COST_FACTORS):
-    """Calculates the cost of 3D printing using fixed Prusa MK3 settings."""
-    filament_length_mm = extract_filament_length(gcode_file)
-    print_time_hours = estimate_print_time(gcode_file)
+    """Calculates the total cost of 3D printing a model based on G-code file.
+
+    Args:
+        gcode_file (_type_): _description_
+        PRINTER_SETTINGS (_type_, optional): _description_. Defaults to PRINTER_SETTINGS.
+        MATERIAL_SETTINGS (_type_, optional): _description_. Defaults to MATERIAL_SETTINGS.
+        COST_FACTORS (_type_, optional): _description_. Defaults to COST_FACTORS.
+
+    Returns:
+        total_cost:  _description_
+        print_time_hours: _description_
+    """
+    # Determine the relative path to the G-code file
+    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../agents/keychain_design"))
+    gcode_file_path = os.path.join(base_path, gcode_file)
+    
+    # Ensure the file exists before proceeding
+    if not os.path.isfile(gcode_file_path):
+        raise FileNotFoundError(f"G-code file not found: {gcode_file_path}")
+    
+    
+    filament_length_mm = extract_filament_length(gcode_file_path)
+    print_time_hours = estimate_print_time(gcode_file_path)
 
     # Material calculations
     filament_radius_mm = MATERIAL_SETTINGS["filament_diameter_mm"] / 2
@@ -149,7 +195,7 @@ def calculate_3d_printing_cost(gcode_file, PRINTER_SETTINGS=PRINTER_SETTINGS, MA
 
 
 
-gcode_file = "test.gcode"
-costs, time= calculate_3d_printing_cost(gcode_file)
-print(f"Total Cost: ${costs}")
-print(f"Total Time: {time} hours")
+# gcode_file = "test.gcode"
+# costs, time= calculate_3d_printing_cost(gcode_file)
+# print(f"Total Cost: ${costs}")
+# print(f"Total Time: {time} hours")

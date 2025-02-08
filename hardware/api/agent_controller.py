@@ -8,11 +8,10 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-from agents.agent_ai.agent import chat_with_agent, get_or_create_agent
+from hardware.agent_ai.agent import chat_with_agent, get_or_create_agent
 
 # Request model for the chat endpoint
 class ChatRequest(BaseModel):
-    user_id: int
     prompt: str
 
 # Response model for the chat endpoint
@@ -38,18 +37,12 @@ def process_chat_request(request: ChatRequest) -> ChatResponse:
     try:        
     
         # Get or create the agent for the user
-        agent_data = get_or_create_agent(request.user_id)
+        agent_data = get_or_create_agent("default")
         agent_executor = agent_data["agent_executor"]
-        config = agent_data["config"]  # Retrieve the config
-        history = agent_data["history"]  # Retrieve the conversation history
-        
-        # Append the user's prompt to history
-        history.append({"role": "user", "message": request.prompt})
+        config = agent_data["config"]  # Retrieve the config        
         
         # Call the agent with the user's prompt
         result = chat_with_agent(request.prompt, agent_executor, config)
-        
-        history.append({"role": "agent", "message": result})
 
         # Extract file references from the response
         file_pattern = re.compile(r'!\[.*?\]\((.*?)\)')
@@ -58,8 +51,7 @@ def process_chat_request(request: ChatRequest) -> ChatResponse:
         cleaned_response = file_pattern.sub('', result).strip()
         cleaned_response = cleaned_response.replace("\n\n", "\n").strip()
 
-        return ChatResponse(response=cleaned_response, 
-                            chat_history=history)
+        return ChatResponse(response=cleaned_response)
 
     except Exception as e:
         raise ValueError(f"Error processing request: {str(e)}")

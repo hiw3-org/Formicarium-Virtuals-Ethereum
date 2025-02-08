@@ -13,7 +13,7 @@ from cdp_langchain.agent_toolkits import CdpToolkit
 from cdp_langchain.utils import CdpAgentkitWrapper
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
-from agents.agent_ai.keychain_design_tools import generate_keychain_stl_tool, generate_image_tool, generate_keychain_gcode_tool, get_ofer
+from agents.agent_ai.keychain_design_tools import generate_keychain_stl_tool, generate_image_tool, generate_keychain_gcode_tool, get_offer_from_printer_agent
 from agents.agent_ai.blockchain_tools import get_all_printers, get_active_orders
 from agents.agent_ai.prompts import user_agent_prompt
 from agents.agent_ai.config import model, wallet_data_file
@@ -54,7 +54,7 @@ def get_or_create_agent(user_id):
                                            generate_keychain_gcode_tool,
                                            get_all_printers,
                                            get_active_orders,
-                                           get_ofer]
+                                           get_offer_from_printer_agent]
 
         agent_executor = create_react_agent(
             llm,
