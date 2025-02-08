@@ -80,6 +80,42 @@
         "ERC20"
       ]
     },
+    "/home/nejc/Projects/formicarium/blockchain/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+      "lastModificationDate": 1738745842654,
+      "contentHash": "8f19f64d2adadf448840908bbaf431c8",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
     "/home/nejc/Projects/formicarium/blockchain/node_modules/@openzeppelin/contracts/utils/Context.sol": {
       "lastModificationDate": 1738745842639,
       "contentHash": "67bfbc07588eb8683b3fd8f6f909563e",
@@ -154,42 +190,6 @@
         "IERC721Errors"
       ]
     },
-    "/home/nejc/Projects/formicarium/blockchain/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": {
-      "lastModificationDate": 1738745842654,
-      "contentHash": "8f19f64d2adadf448840908bbaf431c8",
-      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "IERC20"
-      ]
-    },
     "/home/nejc/Projects/formicarium/blockchain/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol": {
       "lastModificationDate": 1738745842654,
       "contentHash": "794db3115001aa372c79326fcfd44b1f",
@@ -229,8 +229,8 @@
       ]
     },
     "/home/nejc/Projects/formicarium/blockchain/contracts/Formicarium.sol": {
-      "lastModificationDate": 1738916843474,
-      "contentHash": "ee9688e46d1155fd306b6343cc2bd20b",
+      "lastModificationDate": 1738995832524,
+      "contentHash": "28e2352f4da21f964206c928c3314f04",
       "sourceName": "contracts/Formicarium.sol",
       "solcConfig": {
         "version": "0.8.28",

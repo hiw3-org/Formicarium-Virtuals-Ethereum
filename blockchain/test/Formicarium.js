@@ -195,7 +195,7 @@ describe("Formicarium", function () {
     await hre.network.provider.send("evm_mine");
 
     // Transfer funds to provider
-    await formicarium.connect(printer).transferFundsProivder(orderId);
+    await formicarium.connect(printer).transferFundsProvider(orderId);
 
     // Verify provider received funds
     expect(await paymentToken.balanceOf(printer.address)).to.equal(orderPrice);

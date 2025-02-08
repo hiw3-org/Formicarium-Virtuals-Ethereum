@@ -76,25 +76,34 @@ contract Formicarium {
 
     function getYourOrders() public view returns (Order[] memory) {
         uint256 count = 0;
-        address[] memory allOrders = new address[](printerAddresses.length);
         
-        // Count the number of orders placed by the caller
+        // First, count the number of orders placed by the caller
         for (uint256 i = 0; i < printerAddresses.length; i++) {
             address printer = printerAddresses[i];
             address[] storage providerOrderList = providerOrders[printer];
             for (uint256 j = 0; j < providerOrderList.length; j++) {
                 if (orders[providerOrderList[j]].customerId == msg.sender) {
-                    allOrders[count] = providerOrderList[j];
                     count++;
                 }
             }
         }
-        // Create an array with the correct size
+
+        // Now, initialize the array with the correct size
         Order[] memory customerOrders = new Order[](count);
-        for (uint256 k = 0; k < count; k++) {
-            customerOrders[k] = orders[allOrders[k]];
+        uint256 index = 0; // Separate counter for populating the array
+
+        // Populate the customerOrders array
+        for (uint256 i = 0; i < printerAddresses.length; i++) {
+            address printer = printerAddresses[i];
+            address[] storage providerOrderList = providerOrders[printer];
+            for (uint256 j = 0; j < providerOrderList.length; j++) {
+                if (orders[providerOrderList[j]].customerId == msg.sender) {
+                    customerOrders[index] = orders[providerOrderList[j]];
+                    index++;  // Only increment after assignment
+                }
+            }
         }
-        
+
         return customerOrders;
     }
 
