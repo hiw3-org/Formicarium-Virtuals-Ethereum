@@ -22,8 +22,6 @@ Formicarium is a decentralized platform where an AI agent coordinates a fleet of
 5. Order Tracking: Users can monitor the order status and view a live feed of the printing process.
 6. Payment Release: Upon successful order completion, locked funds are released to the service provider.
 
-## Getting Started
-
 ### Prerequisites
 
 - Node.js & npm
