@@ -42,18 +42,8 @@ export default function ChatPage() {
         {/* Right Column (Approval & Order Summary) */}
         <div className="md:col-span-1 w-6/7 max-w-lg min-w-[400px] flex flex-col space-y-4">
           <ApproveCard/>
-          <ApproveCardSTL
-            onApprove={() => alert('Approved')}
-            onReject={() => alert('Rejected')}
-            text="You need an image to generate a model?"
-          />
-          <OrderSummary
-            onApprove={() => alert('Order Confirmed')}
-            dimensions={[10, 20, 30]}
-            quantity={5}
-            price={100}
-            fee={10}
-          />
+          <ApproveCardSTL          />
+          <OrderSummary/>
         </div>
       </div>
     );

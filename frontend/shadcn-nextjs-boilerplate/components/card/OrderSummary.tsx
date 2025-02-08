@@ -1,16 +1,48 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useGlobalContext } from "@/contexts/GlobalContext";
 
-interface OrderSummaryProps {
-    dimensions: number[];
-    quantity: number;
-    price: number;
-    fee: number;
-    onApprove: () => void;
-}
+import {placeOrder} from "@/lib/blockchain"
 
-export default function OrderSummary({ dimensions, quantity, price, fee, onApprove }: OrderSummaryProps) {
+
+
+export default function OrderSummary() {
+    const { orderDimensions, orderQuantity, orderPrice, orderID, printerID, walletAddress , orderDuration} = useGlobalContext();
+
+    function handlePlaceOrder() {
+        //Check if all order details are correct
+        if (orderDimensions.length !== 3) {
+            alert("Please define the dimensions of your order");
+            return;
+        }
+        if (orderQuantity <= 0) {
+            alert("Please define the quantity of your order");
+            return;
+        }
+        if (orderPrice <= 0) {
+            alert("Please define the price of your order");
+            return;
+        }
+        if (orderID === "") {
+            alert("Please define the ID of your order");
+            return;
+        }
+        if (printerID === "") {
+            alert("Please define the printerID of your order");
+            return;
+        }
+        //CLC order duration
+        placeOrder(walletAddress, orderID, printerID, orderPrice, orderPrice, orderDuration).then((result) => {
+            if (result) {
+                alert("Order placed successfully");
+            } else {
+                alert("Order failed");
+            }
+        });
+
+    }
+
     return (
         <div className="bg-[#ebbf3a] p-5 rounded-lg shadow-md flex border-4 border-[#68510A] w-full max-w-2xl">
             <div className="flex flex-col w-full">
@@ -26,11 +58,11 @@ export default function OrderSummary({ dimensions, quantity, price, fee, onAppro
                 <div className="p-2 pb-0">
                     <p className="text-[16px]">Dimensions</p>
                     <div className="text-[20px] flex flex-row items-end space-x-2">
-                        <div className="bg-[#eab71a] px-6 py-1 rounded-md text-black text-center">{dimensions[0]}</div>
+                        <div className="bg-[#eab71a] px-6 py-1 rounded-md text-black text-center">{orderDimensions[0]}</div>
                         <div className="pb-1">x</div>
-                        <div className="bg-[#eab71a] px-6 py-1 rounded-md text-black text-center">{dimensions[1]}</div>
+                        <div className="bg-[#eab71a] px-6 py-1 rounded-md text-black text-center">{orderDimensions[1]}</div>
                         <div className="pb-1">x</div>
-                        <div className="bg-[#eab71a] px-6 py-1 rounded-md text-black text-center">{dimensions[2]}</div>
+                        <div className="bg-[#eab71a] px-6 py-1 rounded-md text-black text-center">{orderDimensions[2]}</div>
                         <div className="pb-1">mm</div>
                     </div>
                 </div>
@@ -38,7 +70,7 @@ export default function OrderSummary({ dimensions, quantity, price, fee, onAppro
                 {/* Quantity Section */}
                 <div className="flex flex-row w-full p-2 pb-0 items-center text-[16px]">
                     <p className="font-semibold">Quantity:</p>
-                    <p className="text-black font-semibold pl-4">{quantity}</p>
+                    <p className="text-black font-semibold pl-4">{orderQuantity}</p>
                 </div>
 
                 {/* Price & Fee Section */}
@@ -48,21 +80,14 @@ export default function OrderSummary({ dimensions, quantity, price, fee, onAppro
                         {/* Price Section */}
                         <div>
                             <p className="text-black">Price for your product:</p>
-                            <p className="text-black text-[24px]">${price.toFixed(2)}</p>
-                        </div>
-
-                        {/* Fee Section */}
-                        <div className="flex flex-row items-center gap-x-1 text-[#637381]">
-                            <p className="text-[20px]">+</p>
-                            <p className="text-[18px]">${fee.toFixed(2)}</p>
-                            <p className="text-[16px]">Tx Fee</p>
+                            <p className="text-black text-[24px]">${orderPrice.toFixed(2)}</p>
                         </div>
                     </div>
 
                     {/* Right Column (Button) */}
                     <div className="flex justify-end items-end">
                         <Button
-                            onClick={onApprove}
+                            onClick={handlePlaceOrder}
                             className="bg-[#eab71a] text-black font-bold py-2 px-6 rounded-sm shadow-md transition border border-black pl-10 pr-10"
                         >
                             BUY

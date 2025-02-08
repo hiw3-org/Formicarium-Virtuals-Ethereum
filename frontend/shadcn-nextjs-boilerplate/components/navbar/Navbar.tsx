@@ -65,7 +65,7 @@ export default function Navbar(props: { brandText: string }) {
     return (
         <nav className="fixed left-0 right-0 z-50 flex items-center px-6 py-3 bg-white/0 backdrop-blur-md shadow-md dark:bg-black/50">
             <div className="flex items-center space-x-3">
-                <Image src="/logo.png" alt="Logo" width={40} height={40} className="w-10 h-10" />
+                <Image src="/logo.png" alt="Logo" width={40} height={40} className="w-10 h-10 rounded-lg" />
                 <Link href="/" className={`${syncopate.className} text-[#eab71a] text-center font-bold flex items-center`} style={{ fontSize: "13px" }}>
                     {props.brandText}
                 </Link>

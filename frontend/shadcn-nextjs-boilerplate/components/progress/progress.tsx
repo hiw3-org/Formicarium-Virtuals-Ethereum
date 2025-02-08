@@ -13,7 +13,7 @@ export default function CustomProgressBar({ progress, color = "#eab71a" }: Custo
             ></div>
 
             {/* Progress Text */}
-            <p className="absolute w-full text-center font-bold text-black">
+            <p className="absolute w-full text-center font-bold text-black rounded-full">
                 {Math.round(progress)}%
             </p>
         </div>
