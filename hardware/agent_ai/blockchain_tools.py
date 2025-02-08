@@ -56,7 +56,7 @@ def sign_order(order_id):
         signed_tx = web3.eth.account.sign_transaction(tx, private_key)
 
         # Log the signed transaction to inspect its attributes
-        print(f"Signed transaction: {signed_tx}")
+        # print(f"Signed transaction: {signed_tx}")
 
         # Send the raw transaction (convert to hex if necessary)
         tx_hash = web3.eth.send_raw_transaction(signed_tx.raw_transaction)
@@ -252,9 +252,13 @@ async def listen_events():
                 continue  # Skip this iteration
 
             # Process the logs
-            for log in new_logs:               
-                # event_data = contract.events.OrderCreated().process_log(log)
-                prompt = f"[Event trigger], blockchain: {log}"
+            for log in new_logs:       
+                if log["topics"][0].hex() == web3.keccak(text="OrderCreated(address,address,uint256,uint256,uint256)").hex():
+                    event_data = contract.events.OrderCreated().process_log(log)     
+                if log["topics"][0].hex() == web3.keccak(text="OrderStarted(address,address)").hex():
+                    event_data = contract.events.OrderStarted().process_log(log)
+                    
+                prompt = f"[Event trigger], blockchain: {event_data}"
                 async with httpx.AsyncClient() as client:
                     response = await client.post("http://localhost:8080/api/create_order_request", json={"prompt": prompt})
                 if response.status_code != 200:

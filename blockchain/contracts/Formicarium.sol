@@ -13,7 +13,6 @@ contract Formicarium {
     struct Printer {
         address ID;
         string printerDetails;
-        address currentOrderId;
     }
 
     struct Order {
@@ -74,6 +73,10 @@ contract Formicarium {
         return allPrinters;
     }
 
+    function getProviderOrders(address _printerId) public view returns (address[] memory) {
+        return providerOrders[_printerId];
+    }
+
     function getYourOrders() public view returns (Order[] memory) {
         uint256 count = 0;
         
@@ -103,7 +106,6 @@ contract Formicarium {
                 }
             }
         }
-
         return customerOrders;
     }
 
@@ -111,7 +113,7 @@ contract Formicarium {
 
     function registerPrinter(string memory _printerDetails) public {
         require(printers[msg.sender].ID == address(0), "Printer already registered");
-        printers[msg.sender] = Printer(msg.sender, _printerDetails, address(0));
+        printers[msg.sender] = Printer(msg.sender, _printerDetails);
         printerAddresses.push(msg.sender);
     }
 
@@ -145,7 +147,7 @@ contract Formicarium {
 
         // First, count active orders to allocate memory efficiently
         for (uint256 i = 0; i < allOrders.length; i++) {
-            if (orders[allOrders[i]].isSigned && !orders[allOrders[i]].isCompletedProvider) {
+            if (orders[allOrders[i]].isSigned && !orders[allOrders[i]].isCompletedProvider && orders[allOrders[i]].startTime == 0) {
                 activeCount++;
             }
         }
@@ -154,7 +156,7 @@ contract Formicarium {
         uint256 index = 0;
 
         for (uint256 i = 0; i < allOrders.length; i++) {
-            if (orders[allOrders[i]].isSigned && !orders[allOrders[i]].isCompletedProvider) {
+            if (orders[allOrders[i]].isSigned && !orders[allOrders[i]].isCompletedProvider && orders[allOrders[i]].startTime == 0)  {
                 activeOrders[index++] = orders[allOrders[i]];
             }
         }

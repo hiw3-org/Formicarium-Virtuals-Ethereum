@@ -35,7 +35,7 @@ def upload_file_to_octoprint(file_path):
     file_path = file_path.lower()
     
     # Remove first 2 characters
-    # file_path = file_path[2:]
+    file_path = file_path[2:]
     
     
     gcode_path = output_folder / f"{Path(file_path).stem}.gcode"

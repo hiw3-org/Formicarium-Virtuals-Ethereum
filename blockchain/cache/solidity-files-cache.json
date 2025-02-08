@@ -228,9 +228,9 @@
         "IERC20Metadata"
       ]
     },
-    "/home/luka/projects/formicarium/blockchain/contracts/Formicarium.sol": {
-      "lastModificationDate": 1739014655282,
-      "contentHash": "362de606dbc96d885884bfc289a9fb0b",
+    "/home/nejc/Projects/formicarium/blockchain/contracts/Formicarium.sol": {
+      "lastModificationDate": 1739000598539,
+      "contentHash": "681a42a832d5fc839a76b2d154c28ff4",
       "sourceName": "contracts/Formicarium.sol",
       "solcConfig": {
         "version": "0.8.28",
