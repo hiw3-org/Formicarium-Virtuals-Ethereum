@@ -229,8 +229,8 @@
       ]
     },
     "/home/nejc/Projects/formicarium/blockchain/contracts/Formicarium.sol": {
-      "lastModificationDate": 1738995832524,
-      "contentHash": "28e2352f4da21f964206c928c3314f04",
+      "lastModificationDate": 1739000598539,
+      "contentHash": "681a42a832d5fc839a76b2d154c28ff4",
       "sourceName": "contracts/Formicarium.sol",
       "solcConfig": {
         "version": "0.8.28",

@@ -39,7 +39,7 @@ async function main() {
     const balance = await paymentToken.balanceOf(customerAddress);
     console.log(`💰 Customer Balance: ${hre.ethers.formatEther(balance)} MTK`);
 
-    const N_orders = 3; // Number of orders per printer
+    const N_orders = 1; // Number of orders per printer
 
     // Calculate the total amount needed for approval
     // Calculate the total amount needed for approval
