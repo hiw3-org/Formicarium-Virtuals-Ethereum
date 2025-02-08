@@ -139,7 +139,7 @@ def estimate_print_time(gcode_file):
                 # Update last known position
                 last_x, last_y, last_z = x, y, z
 
-    return estimated_time / 3600  # Convert seconds to hours
+    return estimated_time/3600  # Convert seconds to hours
 
 # ==========================================================
 @tool("calculate_3d_printing_cost", return_direct=True)
@@ -154,7 +154,7 @@ def calculate_3d_printing_cost(gcode_file, PRINTER_SETTINGS=PRINTER_SETTINGS, MA
 
     Returns:
         total_cost:  _description_
-        print_time_hours: _description_
+        print_time_seconds amount of time in seconds
     """
     # Change to all lowercase
     gcode_file = gcode_file.lower()
@@ -194,7 +194,7 @@ def calculate_3d_printing_cost(gcode_file, PRINTER_SETTINGS=PRINTER_SETTINGS, MA
     # Security factor
     print_time_hours *= 1.5
 
-    return total_cost, print_time_hours
+    return total_cost, print_time_hours*3600
 
 
 
