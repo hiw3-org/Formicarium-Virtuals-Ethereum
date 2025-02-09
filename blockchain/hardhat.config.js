@@ -13,8 +13,13 @@ export default {
     },
     baseMain: {
       url: `https://mainnet.base.org`, // Base Sepolia RPC
-      accounts: [process.env.PRIVATE_KEY],
+      accounts: [process.env.PRIVATE_KEY_MAIN],
       chainId: 8453, // Base Sepolia chain ID
-    }
+    },
+    arbitrumSepolia: {
+      url: `https://sepolia-rollup.arbitrum.io/rpc`, // Arbitrum Sepolia RPC
+      accounts: [process.env.PRIVATE_KEY],
+      chainId: 421614, // Base Sepolia chain ID
+    },
   },
 };
