@@ -11,8 +11,8 @@ prusa_slicer_path = "/home/luka/PrusaSlicer/build/src/prusa-slicer"
 # )
 prusa_settings = (
     "--slice "
-    "--load agents/keychain_design/MMU_PLA.ini "  # Fillament settings
-    "--load agents/keychain_design/MMU2S_Preset.ini "  # Printer settings
+    "--load /home/luka/projects/formicarium/hardware/gcode/MMU_PLA.ini "  # Fillament settings
+    "--load /home/luka/projects/formicarium/hardware/gcode/MMU2S_Preset.ini "  # Printer settings
     "--layer-height 0.20 " 
 )
 

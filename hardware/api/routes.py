@@ -7,6 +7,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from hardware.api.agent_controller import ChatRequest, ChatResponse, process_chat_request
+from hardware.api.gcode_controller import STLRequest, handle_stl_request
 
 router = APIRouter()
 
@@ -69,4 +70,20 @@ async def chat(request: ChatRequest):
         return response
     except ValueError as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+    
+# The API route to handle the G-code generation request
+@router.post("/get_gcode")
+async def get_gcode(request: STLRequest):
+    try:
+        # Call the controller to handle the STL request and generate G-code
+        gcode_path = handle_stl_request(request.stl_file, request.stl_name, request.box_size)
+        
+        # Return the G-code path in the response
+        return {"gcode_path": gcode_path}
+    
+    except Exception as e:
+        # Raise HTTP exception with error details if something goes wrong
+        raise HTTPException(status_code=500, detail=str(e))
+
 

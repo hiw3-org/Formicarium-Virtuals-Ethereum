@@ -72,7 +72,7 @@ async function main() {
             console.log(`📌 Found printer: ${printerId} | Details: ${printer.printerDetails}`);
 
             // Generate unique order ID
-            const orderId = "0x236f9452f64986396af81248f62c14560b8e3cef";
+            const orderId = "0x83a2b91cfd4c8b84c6ebd901052ec05c82185394";
             const minimalPrice = hre.ethers.parseEther((Math.random() * 5 + 5).toFixed(2)); // 5-10 MTK
             const actualPrice = minimalPrice + hre.ethers.parseEther((Math.random() * 2).toFixed(2)); // + 0-2 MTK
             // const duration = Math.floor(Math.random() * 86400) + 3600; // 1 hour to 1 day

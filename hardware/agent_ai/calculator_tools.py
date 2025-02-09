@@ -160,7 +160,7 @@ def calculate_3d_printing_cost(gcode_file, PRINTER_SETTINGS=PRINTER_SETTINGS, MA
     gcode_file = gcode_file.lower()
     
     # Determine the relative path to the G-code file
-    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../agents/keychain_design"))
+    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../gcode/"))
     gcode_file_path = os.path.join(base_path, gcode_file)
     
     # Ensure the file exists before proceeding

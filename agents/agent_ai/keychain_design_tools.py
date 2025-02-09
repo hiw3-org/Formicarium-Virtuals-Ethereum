@@ -14,6 +14,7 @@ from PIL import Image, ImageEnhance
 from trimesh.scene import Scene
 import io
 import secrets
+import base64
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
@@ -191,14 +192,45 @@ def generate_keychain_stl_tool(image_path: str) -> str:
     return str(image_path)  # Return the image path as a string
 
 @tool
-def generate_keychain_gcode_tool(stl_path: str, box_size=[100,100,100]) -> str:
-    """Generate a gcode file based on the user's stl file and save it locally."""
-    stl_path = output_folder / f"{Path(stl_path).stem}.stl"
-    stl_path.parent.mkdir(exist_ok=True)
+def generate_keychain_gcode_tool(stl_path: str, box_size=[100, 100, 100]) -> str:
+    """
+    Generate a G-code file based on the user's STL file and send it to the API.
     
-    output_gcode = slice_stl(stl_path, box_size)
-
-    return str(output_gcode)
+    Args:
+        stl_path (str): Path to the STL file.
+        box_size (list): Dimensions of the bounding box for slicing.
+    
+    Returns:
+        str: The response from the API or an error message.
+    """
+    try:
+        stl_path = output_folder / f"{Path(stl_path).stem}.stl"
+        # Load the STL file
+        with open(stl_path, "rb") as stl_file:
+            stl_data = stl_file.read()
+        
+        # Encode the STL file to base64
+        stl_encoded = base64.b64encode(stl_data).decode("utf-8")
+        
+        # Prepare the payload
+        payload = {
+            "stl_name": Path(stl_path).stem,
+            "stl_file": stl_encoded,
+            "box_size": box_size
+        }
+        
+        # Send the STL file to the API
+        url = "http://localhost:8080/api/get_gcode"
+        response = requests.post(url, json=payload)
+        
+        # Handle the response
+        if response.status_code == 200:
+            return response.json().get("gcode_path", "No G-code path returned.")
+        else:
+            return f"Error: {response.status_code}, {response.text}"
+    
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
 
 @tool
 def get_offer_from_printer_agent(gcode_path: str) -> str:

@@ -18,7 +18,7 @@ POLL_INTERVAL = 15  # Time interval (seconds) for polling API
 
 
 
-output_folder = Path("agents/keychain_design")
+output_folder = Path("hardware/gcode")
 
 # Track previous printer state
 previous_state = None

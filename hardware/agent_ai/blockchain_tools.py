@@ -144,7 +144,7 @@ def transfer_funds_provider(order_id):
         print(f"❌ Error transferring funds for order {order_id}: {e}")
         
         
-@tool("get_active_orders")
+@tool("get_active_orders", return_direct=True)
 def get_active_orders():
     """Retrieve the list of active orders for the current provider address."""
     try:
@@ -157,7 +157,7 @@ def get_active_orders():
         if active_orders:
             return active_orders
         else:
-            return []
+            return "No active orders found, length 0."
     
     except Exception as e:
         print(f"Error fetching active orders for provider {printer_address}: {e}")
