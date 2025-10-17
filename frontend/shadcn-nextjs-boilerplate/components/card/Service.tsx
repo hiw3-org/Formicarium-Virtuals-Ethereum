@@ -34,6 +34,8 @@ export default function ServiceCard({
         printing: "text-[#eab71a] border-[#eab71a] border-2 text-[20px]",
     };
 
+    const relativeCompletion = ((servicePrintTime - serviceTimeRemaining) / servicePrintTime)*100;
+
     return (
         <div className="bg-[#27272A] p-5 rounded-lg shadow-md border-4 border-[#eab71a] w-full max-w-lg">
 
@@ -58,11 +60,11 @@ export default function ServiceCard({
                         {serviceState.toUpperCase()}
                     </div>
                     <div className={"pl-1 pr-1 pb-5"}>
-                        <CustomProgressBar progress={70} color={"#eab71a"}/>
+                        <CustomProgressBar progress={relativeCompletion} color={"#eab71a"}/>
                     </div>
-                    <p className="text-[16px]">Print Time: <span className="font-normal">{servicePrintTime} min</span></p>
+                    <p className="text-[16px]">Print Time: <span className="font-normal">{formatSecondsToHHMMSS(servicePrintTime)}</span></p>
                     <p className="text-[16px]">Time Remaining: <span
-                        className="font-normal">{serviceTimeRemaining} min</span></p>
+                        className="font-normal">{formatSecondsToHHMMSS(serviceTimeRemaining)}</span></p>
                     <p className="text-[16px]">Price: <span className="font-normal">${servicePrice.toFixed(2)}</span></p>
                 </div>
             </div>
@@ -92,4 +94,12 @@ export default function ServiceCard({
             </div>
         </div>
     );
+}
+
+function formatSecondsToHHMMSS(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }

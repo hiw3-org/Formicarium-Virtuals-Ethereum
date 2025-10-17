@@ -8,7 +8,7 @@ import axios from "axios";
 
 export default function Chat() {
     // Access messages from global context
-    const { messages, setMessages } = useGlobalContext();
+    const { messages, setMessages , setImage2Dmodel, setSTLModel, walletAddress, setImageSTLmodel} = useGlobalContext();
 
     // Input state for new messages
     const [inputMessage, setInputMessage] = useState<string>("");
@@ -25,6 +25,11 @@ export default function Chat() {
     const handleSendMessage = async () => {
         if (!inputMessage.trim()) return;
 
+        if(!walletAddress) {
+            alert("Please connect your wallet first");
+            return;
+        }
+
         setLoading(true); // Show loading state
 
         // Add user message to chat
@@ -32,7 +37,7 @@ export default function Chat() {
         setMessages(newMessages);
 
         try {
-            const response = await fetch("http://192.168.221.81:8000/agent/chat", {
+            const response = await fetch("https://82cf-146-212-21-11.ngrok-free.app/agent/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -44,10 +49,24 @@ export default function Chat() {
             if (!response.ok) throw new Error("Failed to fetch AI response");
 
             const data = await response.json();
-            const aiMessage = data.response; // Extract AI response
+            const aiMessage = data.response; // Extract
+
+            console.log("Data from AI: ", data);
 
             // Store AI message in chat
             setMessages([...newMessages, { role: "agent", message: aiMessage }]);
+
+            // Store image in global context
+            if (data.image_file && data.image_file.content) {
+                const imageData=`data:${data.image_file.content_type};base64,${data.image_file.content}`;
+                setImage2Dmodel(imageData);
+            }
+
+            //Check if image stl file is present
+            if (data.stl_file && data.stl_file.content) {
+                const stlData=`data:${data.stl_file.content_type};base64,${data.stl_file.content}`;
+                setImageSTLmodel(stlData);
+            }
 
         } catch (error) {
             console.error("Error sending message:", error);
