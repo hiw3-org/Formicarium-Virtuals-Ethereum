@@ -6,6 +6,18 @@ dotenv.config();
 export default {
   solidity: "0.8.28",
   networks: {
+    hardhat: {
+      forking: {
+        url: process.env.BASE_SEPOLIA_RPC || "https://sepolia.base.org",
+        // Optional: pin to a specific block for reproducibility
+        // blockNumber: 14390000
+      },
+      chainId: 84532, // Keep Base Sepolia chain ID for signature compatibility
+    },
+    localhost: {
+      url: "http://127.0.0.1:8545",
+      chainId: 84532,
+    },
     baseSepolia: {
       url: `https://sepolia.base.org`, // Base Sepolia RPC
       accounts: [process.env.PRIVATE_KEY],
