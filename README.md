@@ -75,14 +75,14 @@ After order completion, the Hardware Agent creates a cryptographically signed fe
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  Creates FeedbackAuth:                                      │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │ • agentId: 25                                      │    │
-│  │ • clientAddress: 0xe880...7310                     │    │
-│  │ • indexLimit: 1                                    │    │
-│  │ • expiry: timestamp + 1 week                       │    │
-│  │ • chainId: 84532 (Base Sepolia)                    │    │
-│  │ • signature: EIP-191 signed by agent's wallet     │    │
-│  └────────────────────────────────────────────────────┘    │
+│  ┌────────────────────────────────────────────────────┐     │
+│  │ • agentId: 25                                      │     │
+│  │ • clientAddress: 0xe880...7310                     │     │
+│  │ • indexLimit: 1                                    │     │
+│  │ • expiry: timestamp + 1 week                       │     │
+│  │ • chainId: 84532 (Base Sepolia)                    │     │
+│  │ • signature: EIP-191 signed by agent's wallet      │     │
+│  └────────────────────────────────────────────────────┘     │
 │                          │                                  │
 │                          ▼                                  │
 │              Sends to Design Agent via API                  │
@@ -109,17 +109,17 @@ Design Agent prompts the customer for feedback and submits it to the ERC-8004 Re
 │  3. Customer provides: Score, Tags                          │
 │                                                             │
 │  Submits to ERC-8004 Reputation Registry:                   │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │ • agentId: 25 (Hardware Agent)                     │    │
-│  │ • score: 85/100 (from customer)                    │    │
-│  │ • tag1: "quality"                                  │    │
-│  │ • tag2: "speed"                                    │    │
-│  │ • fileURI: "ipfs://Qm..."                          │    │
-│  │ • feedbackAuth: <signed authorization>            │    │
-│  └────────────────────────────────────────────────────┘    │
+│  ┌────────────────────────────────────────────────────┐     │
+│  │ • agentId: 25 (Hardware Agent)                     │     │
+│  │ • score: 85/100 (from customer)                    │     │
+│  │ • tag1: "quality"                                  │     │
+│  │ • tag2: "speed"                                    │     │
+│  │ • fileURI: "ipfs://Qm..."                          │     │
+│  │ • feedbackAuth: <signed authorization>             │     │
+│  └────────────────────────────────────────────────────┘     │
 │                          │                                  │
 │                          ▼                                  │
-│      Permanently stored on-chain for Hardware Agent        │
+│      Permanently stored on-chain for Hardware Agent         │
 └─────────────────────────────────────────────────────────────┘
 ```
 
