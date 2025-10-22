@@ -8,11 +8,11 @@
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
-          "evmVersion": "paris",
           "optimizer": {
-            "enabled": false,
+            "enabled": true,
             "runs": 200
           },
+          "evmVersion": "paris",
           "outputSelection": {
             "*": {
               "*": [
@@ -46,11 +46,11 @@
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
-          "evmVersion": "paris",
           "optimizer": {
-            "enabled": false,
+            "enabled": true,
             "runs": 200
           },
+          "evmVersion": "paris",
           "outputSelection": {
             "*": {
               "*": [
@@ -87,11 +87,11 @@
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
-          "evmVersion": "paris",
           "optimizer": {
-            "enabled": false,
+            "enabled": true,
             "runs": 200
           },
+          "evmVersion": "paris",
           "outputSelection": {
             "*": {
               "*": [
@@ -123,11 +123,11 @@
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
-          "evmVersion": "paris",
           "optimizer": {
-            "enabled": false,
+            "enabled": true,
             "runs": 200
           },
+          "evmVersion": "paris",
           "outputSelection": {
             "*": {
               "*": [
@@ -159,11 +159,11 @@
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
-          "evmVersion": "paris",
           "optimizer": {
-            "enabled": false,
+            "enabled": true,
             "runs": 200
           },
+          "evmVersion": "paris",
           "outputSelection": {
             "*": {
               "*": [
@@ -197,11 +197,11 @@
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
-          "evmVersion": "paris",
           "optimizer": {
-            "enabled": false,
+            "enabled": true,
             "runs": 200
           },
+          "evmVersion": "paris",
           "outputSelection": {
             "*": {
               "*": [
@@ -229,17 +229,17 @@
       ]
     },
     "/home/nejc/Projects/HIW3/Formicarium-Virtuals-Ethereum/blockchain/contracts/Formicarium.sol": {
-      "lastModificationDate": 1760727216725,
-      "contentHash": "681a42a832d5fc839a76b2d154c28ff4",
+      "lastModificationDate": 1761153145724,
+      "contentHash": "ad497e6b8544bedbe285057c3d28db2c",
       "sourceName": "contracts/Formicarium.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
-          "evmVersion": "paris",
           "optimizer": {
-            "enabled": false,
+            "enabled": true,
             "runs": 200
           },
+          "evmVersion": "paris",
           "outputSelection": {
             "*": {
               "*": [
@@ -274,11 +274,11 @@
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
-          "evmVersion": "paris",
           "optimizer": {
-            "enabled": false,
+            "enabled": true,
             "runs": 200
           },
+          "evmVersion": "paris",
           "outputSelection": {
             "*": {
               "*": [
